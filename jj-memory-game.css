@@ -1,0 +1,319 @@
+/* ============================================================
+   JJ ARCADE — MEMORY GAME CSS
+   Card size: 300 × 215px (landscape)
+   Class names aligned with memory.js output
+   ============================================================ */
+
+
+/* ─── BOARD GRID ─────────────────────────────────────────────
+   12 cards (6 pairs) = 4 columns × 3 rows at full width.
+   Fixed pixel columns so cards never squish.
+   ──────────────────────────────────────────────────────────── */
+.jj-memory__board {
+  display: grid;
+  grid-template-columns: repeat(4, 300px);
+  gap: 16px;
+  justify-content: center;
+  padding: 20px 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Board dims when question overlay is active */
+.jj-memory__board.jj-dim {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.jj-memory__board.jj-hidden {
+  display: none;
+}
+
+/* Tablet: 3 columns */
+@media (max-width: 1320px) {
+  .jj-memory__board {
+    grid-template-columns: repeat(3, 300px);
+  }
+}
+
+/* Mobile landscape / small tablet: 2 columns fixed */
+@media (max-width: 980px) {
+  .jj-memory__board {
+    grid-template-columns: repeat(2, 300px);
+    gap: 12px;
+  }
+}
+
+/* Mobile portrait: 2 fluid columns */
+@media (max-width: 660px) {
+  .jj-memory__board {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+}
+
+
+/* ─── CARD WRAPPER ───────────────────────────────────────────
+   The outer button. Perspective is set here for the 3D flip.
+   On mobile the height is driven by aspect-ratio instead.
+   ──────────────────────────────────────────────────────────── */
+.jj-memory__card {
+  width: 300px;
+  height: 215px;
+  perspective: 900px;
+  cursor: pointer;
+  position: relative;
+  border: none;
+  background: transparent;
+  padding: 0;
+  border-radius: 12px;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.jj-memory__card:focus-visible {
+  outline: 3px solid #e63030;
+  outline-offset: 3px;
+}
+
+/* Fluid sizing on small screens */
+@media (max-width: 660px) {
+  .jj-memory__card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 300 / 215;
+    perspective: 600px;
+  }
+}
+
+/* Lift on hover (only when not matched) */
+.jj-memory__card:not(.is-matched):hover {
+  transform: translateY(-4px);
+  transition: transform 0.15s ease;
+}
+
+
+/* ─── CARD INNER (FLIP CONTAINER) ───────────────────────────
+   transform-style: preserve-3d is the key to the flip working.
+   The actual rotation happens here.
+   ──────────────────────────────────────────────────────────── */
+.jj-memory__card-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+  border-radius: 12px;
+}
+
+/* Flip triggered by .is-flipped on the parent button */
+.jj-memory__card.is-flipped .jj-memory__card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Matched cards stay flipped and fade slightly */
+.jj-memory__card.is-matched .jj-memory__card-inner {
+  transform: rotateY(180deg);
+}
+
+.jj-memory__card.is-matched {
+  opacity: 0.55;
+  pointer-events: none;
+  cursor: default;
+  filter: brightness(0.85) saturate(0.6);
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+
+/* ─── FRONT + BACK FACES ─────────────────────────────────────
+   Both faces are absolutely positioned and fill the card.
+   backface-visibility: hidden prevents the rear face bleeding through.
+   ──────────────────────────────────────────────────────────── */
+.jj-memory__card-front,
+.jj-memory__card-back {
+  position: absolute;
+  inset: 0;                       /* top/right/bottom/left: 0 */
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* FRONT = face-down state (your new jj-card-junior-1.png) */
+.jj-memory__card-front {
+  transform: rotateY(0deg);
+  background: #1a1a2e;            /* fallback colour if image fails */
+}
+
+/* BACK = the character card revealed after flip */
+.jj-memory__card-back {
+  transform: rotateY(180deg);
+  background: #0d0d1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  padding: 8px;
+}
+
+
+/* ─── CARD IMAGES ────────────────────────────────────────────
+   object-fit: cover fills the card without distortion.
+   Switch to contain if you need the full image visible (adds letterbox).
+   ──────────────────────────────────────────────────────────── */
+.jj-memory__card-front img,
+.jj-memory__card-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  border-radius: 12px;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+
+/* ─── STATS BAR ──────────────────────────────────────────────*/
+.jj-memory__top {
+  margin-bottom: 16px;
+}
+
+.jj-memory__stats {
+  display: flex;
+  gap: 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  justify-content: center;
+}
+
+
+/* ─── QUESTION OVERLAY ───────────────────────────────────────*/
+.jj-memory__question {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.jj-memory__question.jj-hidden {
+  display: none;
+}
+
+.jj-memory__question-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.jj-memory__question-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: #c0392b;
+}
+
+.jj-memory__question-card p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  color: #333;
+  line-height: 1.5;
+}
+
+
+/* ─── CHOICE BUTTONS ─────────────────────────────────────────*/
+.jj-memory__choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.jj-choice-btn {
+  padding: 12px 20px;
+  border: 2px solid #e63030;
+  border-radius: 8px;
+  background: transparent;
+  color: #e63030;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.jj-choice-btn:hover {
+  background: #e63030;
+  color: #fff;
+}
+
+
+/* ─── VICTORY OVERLAY ────────────────────────────────────────*/
+.jj-memory__victory {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.jj-memory__victory.jj-hidden {
+  display: none;
+}
+
+.jj-memory__victory-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.jj-memory__victory-card h3 {
+  font-size: 1.8rem;
+  color: #c0392b;
+  margin-bottom: 16px;
+}
+
+.jj-memory__victory-card p {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+#jj-restart {
+  margin-top: 20px;
+  padding: 12px 32px;
+  background: #e63030;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+#jj-restart:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+}
+
+
+/* ─── UTILITY ────────────────────────────────────────────────*/
+.jj-hidden {
+  display: none !important;
+}

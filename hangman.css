@@ -1,0 +1,292 @@
+/* ============================================================
+   JJ Arcade — Hangman Game CSS
+   File: hangman.css
+   ============================================================ */
+
+/* ── Wrapper ── */
+.hm-wrapper {
+  position: relative;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #1a1a2e;
+  border-radius: 16px;
+  padding: 20px;
+  color: #fff;
+  overflow: hidden;
+  min-height: 500px;
+}
+
+/* ── Category Tabs ── */
+.hm-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.hm-cat-btn {
+  background: #16213e;
+  border: 2px solid #0f3460;
+  color: #a0aec0;
+  padding: 7px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.hm-cat-btn:hover {
+  border-color: #e94560;
+  color: #fff;
+}
+
+.hm-cat-btn.hm-cat-active {
+  background: #e94560;
+  border-color: #e94560;
+  color: #fff;
+}
+
+/* ── Main Layout ── */
+.hm-main {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .hm-main {
+    grid-template-columns: 1fr;
+  }
+  .hm-character-panel {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* ── Character Panel ── */
+.hm-scaffold {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.hm-parts-container {
+  position: relative;
+  width: 180px;
+  height: 320px;
+  /* Adjust these values if your images have different sizing */
+}
+
+/* Each body part is absolutely positioned to overlap correctly */
+.hm-body-part {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  user-select: none;
+  pointer-events: none;
+}
+
+.hm-part-hidden {
+  opacity: 0;
+  transform: scale(0.92) translateY(8px);
+}
+
+.hm-part-visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.hm-wrong-count {
+  font-size: 0.85rem;
+  color: #fc8181;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ── Game Panel ── */
+.hm-game-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Hint ── */
+.hm-hint-badge {
+  background: #16213e;
+  border-left: 4px solid #e94560;
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+  line-height: 1.4;
+}
+
+/* ── Word Display ── */
+.hm-word-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 56px;
+  align-items: center;
+}
+
+.hm-letter-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 44px;
+  background: #16213e;
+  border-bottom: 3px solid #4a5568;
+  border-radius: 6px 6px 0 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.hm-letter-revealed {
+  border-bottom-color: #e94560;
+  color: #fbd38d;
+  background: #2d2047;
+}
+
+/* ── Status ── */
+.hm-status {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fbd38d;
+  min-height: 24px;
+}
+
+/* ── Keyboard ── */
+.hm-keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 400px;
+}
+
+.hm-key {
+  width: 36px;
+  height: 36px;
+  background: #16213e;
+  border: 2px solid #2d3748;
+  color: #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+
+.hm-key:hover:not(:disabled) {
+  background: #2d3748;
+  border-color: #4a5568;
+  transform: translateY(-1px);
+}
+
+.hm-key:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.hm-key.hm-key-correct {
+  background: #276749;
+  border-color: #48bb78;
+  color: #c6f6d5;
+}
+
+.hm-key.hm-key-wrong {
+  background: #742a2a;
+  border-color: #e94560;
+  color: #fed7d7;
+}
+
+/* ── New Game Button ── */
+.hm-new-game-btn {
+  background: #e94560;
+  border: none;
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  align-self: flex-start;
+}
+
+.hm-new-game-btn:hover {
+  background: #c62a45;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+/* ── Overlay ── */
+.hm-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 30, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border-radius: 16px;
+  animation: hmFadeIn 0.3s ease;
+}
+
+.hm-overlay.hm-hidden {
+  display: none;
+}
+
+.hm-overlay-box {
+  text-align: center;
+  padding: 32px;
+  background: #16213e;
+  border-radius: 16px;
+  border: 2px solid #e94560;
+  max-width: 320px;
+  width: 90%;
+}
+
+.hm-overlay-emoji {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.hm-overlay-msg {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fbd38d;
+  margin-bottom: 8px;
+}
+
+.hm-overlay-word {
+  font-size: 0.95rem;
+  color: #a0aec0;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.hm-overlay-btn {
+  align-self: center !important;
+}
+
+/* ── Animation ── */
+@keyframes hmFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}

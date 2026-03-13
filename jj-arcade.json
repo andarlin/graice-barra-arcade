@@ -1,0 +1,76 @@
+{
+  "brand": "gblc",
+  "pageTitle": "Jiu-Jitsu Arcade",
+  "pageSubtitle": "Fun + skill-building games for students and families.",
+  "games": [
+    {
+      "id": "memory",
+      "title": "GB Junior 1 Memory Game",
+      "description": "Match the Junior 1 characters and unlock a Jiu-Jitsu question.",
+      "type": "memory",
+      "pairs": 6,
+      "cards": [
+        {
+          "id": "junior_1",
+          "label": "Junior Champ 1",
+          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Junior_Champ_1.png"
+        },
+        {
+          "id": "junior_2",
+          "label": "Junior Champ 2",
+          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Junior_Champ_2.png"
+        },
+        {
+          "id": "junior_3",
+          "label": "Junior Champ 3",
+          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Junior_Champ_3.png"
+        },
+        {
+          "id": "junior_4",
+          "label": "Junior Champ 4",
+          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Junior_Champ_4.png"
+        },
+        {
+          "id": "little_1",
+          "label": "Little Champ 1",
+          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Little_Champ_1.png"
+        },
+        {
+          "id": "little_2",
+          "label": "Little Champ 2",
+          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Little_Champ_2.png"
+        }
+      ],
+      "questions": [
+        {
+          "q": "What is one thing you do to be a great training partner?",
+          "choices": ["Be safe", "Be respectful", "Help others learn"]
+        },
+        {
+          "q": "What position do you feel most confident in right now?",
+          "choices": ["Closed guard", "Mount", "Side control"]
+        },
+        {
+          "q": "What is one goal you want to achieve this month?",
+          "choices": ["Train more", "Learn a new move", "Get stronger"]
+        },
+        {
+          "q": "What is your favorite warm-up drill and why?",
+          "choices": ["Shrimping", "Bear crawls", "Forward rolls"]
+        },
+        {
+          "q": "If you could improve one skill instantly, what would it be?",
+          "choices": ["Escapes", "Guard retention", "Takedowns"]
+        }
+      ]
+    },
+    {
+      "id": "technique-match",
+      "title": "Technique Match",
+      "description": "Match the technique name to its description.",
+      "type": "technique-match",
+      "pairs": 6,
+      "dataUrl": "/wp-content/themes/hello-elementor/assets/jj-arcade/data/technique-match.json"
+    }
+  ]
+}

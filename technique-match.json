@@ -1,0 +1,10 @@
+{
+  "items": [
+    { "id": "armbar", "name": "Armbar", "desc": "Control the arm and extend the elbow for the finish." },
+    { "id": "triangle", "name": "Triangle", "desc": "Leg choke using a figure-four around the neck and one arm." },
+    { "id": "kimura", "name": "Kimura", "desc": "Figure-four grip that attacks the shoulder rotation." },
+    { "id": "mount", "name": "Mount", "desc": "Top control position with hips over opponent’s torso." },
+    { "id": "guard", "name": "Guard", "desc": "Bottom position using legs to control distance and posture." },
+    { "id": "sweep", "name": "Sweep", "desc": "Reverse positions from bottom to top control." }
+  ]
+}

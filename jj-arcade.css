@@ -1,0 +1,358 @@
+/* =========================
+   JJ Arcade Wrapper / Page
+   ========================= */
+
+.jj-arcade-wrapper{
+  width: 100%;
+  max-width: 100%;
+}
+
+body.page-template-template-jiujitsu-arcade{
+  background: #f8fafc;
+}
+
+/* Main arcade container */
+.jj-arcade{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+}
+
+/* Header */
+.jj-arcade__header h1{
+  font-size: 32px;
+  margin: 0 0 6px;
+}
+
+.jj-arcade__header p{
+  margin: 0 0 18px;
+  opacity: 0.8;
+}
+
+/* Layout */
+.jj-arcade__layout{
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 900px){
+  .jj-arcade__layout{
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Force darker text */
+.jj-arcade,
+.jj-arcade p,
+.jj-arcade h1,
+.jj-arcade h2,
+.jj-arcade h3{
+  color: #1f2937 !important;
+}
+
+/* Sidebar */
+.jj-arcade__sidebar{
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+/* =========================
+   Game list button wrap fix
+   Supports both naming styles:
+   - jj-arcade__game-*
+   - jj-arcade_game-*
+   ========================= */
+
+.jj-arcade__game-btn,
+.jj-arcade_game-btn{
+  width: 100%;
+  text-align: left;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  background: #fff;
+  cursor: pointer;
+
+  /* prevent clipping */
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
+.jj-arcade__game-title,
+.jj-arcade_game-title{
+  font-weight: 700;
+  color: #7c1f2a;
+  line-height: 1.2;
+}
+
+.jj-arcade__game-desc,
+.jj-arcade_game-desc{
+  font-size: 13px;
+  margin-top: 4px;
+  color: #374151;
+  opacity: 0.85;
+  line-height: 1.35;
+
+  /* ensure wrap */
+  white-space: normal !important;
+  overflow: visible !important;
+  max-height: none !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  /* guard against line-clamp */
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+}
+
+@media (max-width: 768px){
+  .jj-arcade__game-desc,
+  .jj-arcade_game-desc{
+    font-size: 12px;
+  }
+}
+
+/* =========================
+   Memory Game UI
+   ========================= */
+
+.jj-memory__stats{
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Board */
+.jj-memory__board{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px){
+  .jj-memory__board{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* =========================
+   Cards (Bulletproof swap)
+   ========================= */
+
+.jj-card{
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: outline 150ms ease, box-shadow 150ms ease;
+}
+
+/* Front + Back layers */
+.jj-card__front,
+.jj-card__back{
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* Default state: show front, hide back */
+.jj-card__front{
+  background: #f1f5f9;
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.jj-card__back{
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* When flipped OR matched: show back, hide front */
+.jj-card.is-flipped .jj-card__front,
+.jj-card.is-matched .jj-card__front{
+  opacity: 0;
+  pointer-events: none;
+}
+
+.jj-card.is-flipped .jj-card__back,
+.jj-card.is-matched .jj-card__back{
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Matched outline */
+.jj-card.is-matched{
+  outline: 3px solid #fbbf24;
+}
+
+/* Images inside cards */
+.jj-card img{
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  display: block;
+}
+
+/* =========================
+   Overlays / States
+   ========================= */
+
+.jj-hidden{
+  display: none !important;
+}
+
+/* (Used by JS) */
+.jj-dim{
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* =========================
+   Team Question Overlay
+   ========================= */
+
+/* Stable centered overlay (no transform math) */
+#jj-question.jj-memory__question{
+  position: absolute !important;
+
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 auto !important;
+
+  bottom: 18px !important;
+  top: auto !important;
+
+  width: min(520px, calc(100% - 24px)) !important;
+  z-index: 999 !important;
+}
+
+/* Question card styling (clean, elevated) */
+.jj-memory__question-card{
+  border: none !important;
+  border-radius: 18px;
+  padding: 20px 22px;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+.jj-memory__question-card h3{
+  font-size: 20px;
+  margin: 0 0 10px;
+  color: #7c1f2a;
+  text-align: center;
+}
+
+#jj-question-text{
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+  margin-bottom: 16px;
+  color: #374151;
+}
+
+/* 3-choice answers layout */
+.jj-memory__choices{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.jj-choice-btn{
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.jj-choice-btn:hover{
+  background: #f8fafc;
+}
+
+@media (min-width: 900px){
+  /* If you ever want 3 columns on desktop, keep this.
+     If you prefer always stacked, delete this block. */
+  .jj-memory__choices{
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px){
+  .jj-memory__question-card{
+    padding: 18px;
+  }
+
+  #jj-question-text{
+    font-size: 14px;
+  }
+}
+
+/* Dim board while question is visible (reliable; board comes before question) */
+.jj-memory:has(#jj-question:not(.jj-hidden)) #jj-board{
+  opacity: 0.35;
+  filter: blur(0.5px);
+  pointer-events: none;
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+
+/* Fade-in animation for the overlay */
+@keyframes jjQuestionIn{
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+#jj-question:not(.jj-hidden){
+  animation: jjQuestionIn 220ms ease-out both;
+}
+
+/* =========================
+   Victory Card
+   ========================= */
+
+.jj-memory__victory-card{
+  margin-top: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  border-radius: 14px;
+  padding: 14px;
+  background: #fff;
+}
+
+.jj-memory__victory-card button{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+}

@@ -1,0 +1,58 @@
+{
+  "categories": {
+    "techniques": {
+      "label": "Techniques",
+      "words": [
+        { "word": "ARMBAR", "hint": "A joint lock that hyperextends the elbow" },
+        { "word": "TRIANGLE", "hint": "A choke using your legs around the neck and arm" },
+        { "word": "KIMURA", "hint": "A shoulder lock named after Masahiko Kimura" },
+        { "word": "OMOPLATA", "hint": "A shoulder lock using your legs" },
+        { "word": "GUILLOTINE", "hint": "A choke from the front targeting the neck" },
+        { "word": "DARCE", "hint": "An arm-in choke from side control" },
+        { "word": "HEELHOOK", "hint": "A dangerous leg lock targeting the knee" },
+        { "word": "SINGLELEG", "hint": "A common wrestling takedown" },
+        { "word": "KNEEBAR", "hint": "A straight leg lock on the knee" },
+        { "word": "AMERICANA", "hint": "A bent arm shoulder lock from top position" }
+      ]
+    },
+    "positions": {
+      "label": "Positions",
+      "words": [
+        { "word": "MOUNT", "hint": "Sitting on your opponent's chest" },
+        { "word": "GUARD", "hint": "Bottom position with legs around opponent" },
+        { "word": "HALFGUARD", "hint": "One leg trapped between opponent's legs" },
+        { "word": "BUTTERFLY", "hint": "Guard with feet hooked inside opponent's thighs" },
+        { "word": "SPIDER", "hint": "Guard using grips on sleeves and feet on biceps" },
+        { "word": "TURTLE", "hint": "All fours defensive position on hands and knees" },
+        { "word": "BACKTAKE", "hint": "Getting behind your opponent with hooks in" },
+        { "word": "SIDEMOUNT", "hint": "Chest-to-chest control beside your opponent" },
+        { "word": "KNEEONBELLY", "hint": "Knee pressing down on opponent's stomach" },
+        { "word": "DEEPHALFGUARD", "hint": "Guard where you go underneath your opponent's hips" }
+      ]
+    },
+    "belts": {
+      "label": "Belt Ranks",
+      "words": [
+        { "word": "WHITE", "hint": "The very first belt in Jiu-Jitsu" },
+        { "word": "BLUE", "hint": "Second belt rank, usually after 1-2 years" },
+        { "word": "PURPLE", "hint": "Third belt rank, an advanced student" },
+        { "word": "BROWN", "hint": "Fourth belt rank, nearly a black belt" },
+        { "word": "BLACK", "hint": "The highest standard belt rank in BJJ" },
+        { "word": "CORAL", "hint": "Ultra-rare belt for masters of the art" },
+        { "word": "REDBLACK", "hint": "Belt worn by 7th degree masters" },
+        { "word": "STRIPE", "hint": "The small tape added to show progress on a belt" }
+      ]
+    },
+    "people": {
+      "label": "BJJ Legends",
+      "words": [
+        { "word": "GRACIEKARL", "hint": "The founding family of Brazilian Jiu-Jitsu" },
+        { "word": "HELIO", "hint": "He adapted Judo into what we call BJJ today" },
+        { "word": "ROYCE", "hint": "He won the first UFC tournaments and put BJJ on the map" },
+        { "word": "RICKSON", "hint": "Considered by many the greatest BJJ fighter ever" },
+        { "word": "DEMIAN", "hint": "Olympic Judo gold medalist and BJJ black belt" },
+        { "word": "MARCELO", "hint": "Multiple ADCC champion known for his X-guard" }
+      ]
+    }
+  }
+}

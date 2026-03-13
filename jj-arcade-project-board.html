@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JJ Arcade — Project Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161920;
+    --surface2: #1e222d;
+    --border: #2a2f3e;
+    --accent: #c0392b;
+    --accent2: #e74c3c;
+    --gold: #f39c12;
+    --green: #27ae60;
+    --blue: #2980b9;
+    --purple: #8e44ad;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --tag-bg: #1e222d;
+
+    --status-todo: #374151;
+    --status-progress: #1d4ed8;
+    --status-review: #7c3aed;
+    --status-done: #15803d;
+    --status-blocked: #991b1b;
+
+    --p-critical: #ef4444;
+    --p-high: #f97316;
+    --p-medium: #eab308;
+    --p-low: #22c55e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .project-badge {
+    background: var(--accent);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.08em;
+  }
+
+  .project-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .project-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 20px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+  }
+
+  /* ── Nav Tabs ── */
+  .nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+  }
+
+  .nav-tab {
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .nav-tab:hover { color: var(--text); }
+
+  .nav-tab.active {
+    color: var(--accent2);
+    border-bottom-color: var(--accent2);
+  }
+
+  /* ── Main layout ── */
+  .main {
+    padding: 28px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ── Views ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── Sprint containers ── */
+  .sprint {
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .sprint-header {
+    background: var(--surface);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .sprint-header:hover { background: var(--surface2); }
+
+  .sprint-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .sprint-toggle {
+    font-size: 12px;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+
+  .sprint.collapsed .sprint-toggle { transform: rotate(-90deg); }
+
+  .sprint-name {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  .sprint-meta {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .sprint-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sprint-progress-bar {
+    width: 120px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .sprint-progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  .sprint-pct {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    min-width: 32px;
+  }
+
+  /* Sprint body */
+  .sprint-body {
+    border-top: 1px solid var(--border);
+  }
+
+  .sprint.collapsed .sprint-body { display: none; }
+
+  /* ── Ticket row ── */
+  .ticket {
+    display: grid;
+    grid-template-columns: 28px 90px 1fr 100px 100px 90px 80px;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .ticket:last-child { border-bottom: none; }
+  .ticket:hover { background: var(--surface2); }
+  .ticket.expanded { background: var(--surface2); }
+
+  /* ticket type icon */
+  .ticket-type {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .type-bug { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .type-feature { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .type-task { background: rgba(139,92,246,0.15); color: #a78bfa; }
+  .type-data { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .type-test { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+  /* ticket id */
+  .ticket-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ticket title */
+  .ticket-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .ticket-title small {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* status pill */
+  .status-pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .s-todo { background: rgba(55,65,81,0.4); color: #9ca3af; border: 1px solid #374151; }
+  .s-progress { background: rgba(29,78,216,0.2); color: #60a5fa; border: 1px solid #1d4ed8; }
+  .s-review { background: rgba(124,58,237,0.2); color: #c084fc; border: 1px solid #7c3aed; }
+  .s-done { background: rgba(21,128,61,0.2); color: #4ade80; border: 1px solid #15803d; }
+  .s-blocked { background: rgba(153,27,27,0.2); color: #f87171; border: 1px solid #991b1b; }
+
+  /* priority dot */
+  .priority {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .prio-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .prio-critical .prio-dot { background: var(--p-critical); }
+  .prio-high .prio-dot { background: var(--p-high); }
+  .prio-medium .prio-dot { background: var(--p-medium); }
+  .prio-low .prio-dot { background: var(--p-low); }
+
+  /* effort */
+  .effort {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* file tag */
+  .file-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 5px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Ticket Detail Panel ── */
+  .ticket-detail {
+    display: none;
+    padding: 20px 20px 20px 60px;
+    background: #0d1117;
+    border-top: 1px solid var(--border);
+    animation: slideDown 0.2s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .ticket.expanded + .ticket-detail { display: block; }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+  }
+
+  .detail-section h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .detail-desc {
+    font-size: 13px;
+    color: #c9d1d9;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .ac-list {
+    list-style: none;
+    margin-bottom: 20px;
+  }
+
+  .ac-list li {
+    font-size: 12px;
+    color: #c9d1d9;
+    padding: 5px 0;
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.4;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .ac-list li::before {
+    content: '□';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .ac-list li.done::before { content: '✓'; color: var(--green); }
+
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #7ee787;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.6;
+  }
+
+  .detail-meta-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .detail-meta-item:last-child { border-bottom: none; }
+
+  .detail-meta-key { color: var(--muted); }
+  .detail-meta-val { color: var(--text); font-weight: 500; }
+
+  /* ── Kanban view ── */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    overflow-x: auto;
+  }
+
+  .kanban-col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    min-width: 220px;
+  }
+
+  .kanban-col-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .kanban-col-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .kanban-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--border);
+    padding: 2px 7px;
+    border-radius: 99px;
+    color: var(--muted);
+  }
+
+  .kanban-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+
+  .kanban-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .kanban-card-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  .kanban-card-title {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .kanban-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .kanban-sprint-tag {
+    font-size: 9px;
+    background: rgba(192,57,43,0.15);
+    color: var(--accent2);
+    border: 1px solid rgba(192,57,43,0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  /* ── Summary view ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .summary-card-num {
+    font-size: 40px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .summary-card-label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin: 28px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bug-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .bug-table th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .bug-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .bug-table tr:last-child td { border-bottom: none; }
+  .bug-table tr:hover td { background: var(--surface2); }
+
+  .impact-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 5px;
+    text-transform: uppercase;
+  }
+
+  .impact-critical { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .impact-high { background: rgba(249,115,22,0.15); color: #fb923c; }
+  .impact-medium { background: rgba(234,179,8,0.15); color: #fbbf24; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .ticket {
+      grid-template-columns: 28px 80px 1fr 90px;
+    }
+    .ticket > *:nth-child(5),
+    .ticket > *:nth-child(6),
+    .ticket > *:nth-child(7) { display: none; }
+
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .kanban { grid-template-columns: repeat(2, 1fr); }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .main { padding: 16px; }
+    .header { padding: 12px 16px; }
+    .nav { padding: 0 16px; }
+    .stats-row { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     HEADER
+═══════════════════════════════════════ -->
+<header class="header">
+  <div class="header-left">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px;">
+        <span class="project-badge">JJARC</span>
+        <span class="project-name">Jiu-Jitsu Arcade</span>
+      </div>
+      <div class="project-sub">Gracie Barra Lake Country · WordPress · Hello Elementor</div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-num" style="color:#ef4444">2</div>
+      <div class="stat-label">Bugs</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:#60a5fa">14</div>
+      <div class="stat-label">Tickets</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:#4ade80">2</div>
+      <div class="stat-label">Sprints</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:#fbbf24">4</div>
+      <div class="stat-label">Games</div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-tab active" onclick="switchView('board')">📋 Board</div>
+  <div class="nav-tab" onclick="switchView('kanban')">🗂 Kanban</div>
+  <div class="nav-tab" onclick="switchView('bugs')">🐛 Bug Tracker</div>
+  <div class="nav-tab" onclick="switchView('summary')">📊 Summary</div>
+</nav>
+
+<div class="main">
+
+<!-- ══════════════════════════════════════
+     BOARD VIEW
+═══════════════════════════════════════ -->
+<div id="view-board" class="view active">
+
+  <!-- ── SPRINT 1 ── -->
+  <div class="sprint" id="sprint1">
+    <div class="sprint-header" onclick="toggleSprint('sprint1')">
+      <div class="sprint-left">
+        <span class="sprint-toggle">▼</span>
+        <span class="sprint-name">🔴 Sprint 1 — Critical Bug Fixes</span>
+        <span class="sprint-meta">Est. 30 min · Do this first</span>
+      </div>
+      <div class="sprint-progress-wrap">
+        <div class="sprint-progress-bar"><div class="sprint-progress-fill" style="width:0%"></div></div>
+        <span class="sprint-pct">0%</span>
+      </div>
+    </div>
+    <div class="sprint-body">
+
+      <!-- Column headers -->
+      <div style="display:grid;grid-template-columns:28px 90px 1fr 100px 100px 90px 80px;gap:12px;padding:8px 20px;border-bottom:1px solid var(--border);">
+        <div></div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">ID</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Title</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Status</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Priority</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Effort</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">File</div>
+      </div>
+
+      <!-- JJARC-001 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-bug">B</div>
+        <div class="ticket-id">JJARC-001</div>
+        <div class="ticket-title">Add <code style="font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;">cardFront</code> to jj-arcade.json
+          <small>All memory cards showing GB logo placeholder instead of character images</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-critical"><span class="prio-dot"></span>Critical</div>
+        <div class="effort">5 min</div>
+        <div class="file-tag">jj-arcade.json</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Description</h4>
+              <p class="detail-desc">The memory game card front face relies on <code>window.JJ_ARCADE_CONFIG.cardFront</code> to show the face-down logo. This property doesn't exist in <code>jj-arcade.json</code>, so <code>cardFront</code> is <code>undefined</code> — resulting in a broken image src. All 12 cards show a broken image or nothing on the front face.</p>
+            </div>
+            <div class="detail-section">
+              <h4>Root Cause (memory.js line ~75)</h4>
+              <div class="code-block">src="${(window.JJ_ARCADE_CONFIG && window.JJ_ARCADE_CONFIG.cardFront)
+  ? window.JJ_ARCADE_CONFIG.cardFront
+  : ''}"
+// ↑ cardFront is never set → empty string → broken image</div>
+            </div>
+            <div class="detail-section">
+              <h4>Fix — Add to jj-arcade.json (top level)</h4>
+              <div class="code-block">"cardFront": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/gb_3d_logo.png"</div>
+            </div>
+            <div class="detail-section">
+              <h4>Acceptance Criteria</h4>
+              <ul class="ac-list">
+                <li>All 12 face-down cards show the GB logo</li>
+                <li>On match, card back reveals the correct character image</li>
+                <li>No broken image icons visible at any point</li>
+                <li>Verified in both desktop and mobile view</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 1</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">🐛 Bug</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#ef4444">Critical</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">5 min</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">File(s)</span><span class="detail-meta-val">jj-arcade.json</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Blocker</span><span class="detail-meta-val">Memory game usability</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Fixed File</span><span class="detail-meta-val" style="color:#4ade80">✅ Provided below</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JJARC-002 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-bug">B</div>
+        <div class="ticket-id">JJARC-002</div>
+        <div class="ticket-title">Enqueue <code style="font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;">technique-match.js</code> in PHP template
+          <small>Technique Match game completely broken — script never loaded by WordPress</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-critical"><span class="prio-dot"></span>Critical</div>
+        <div class="effort">5 min</div>
+        <div class="file-tag">template.php</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Description</h4>
+              <p class="detail-desc"><code>technique-match.js</code> (5.9 KB, fully built) is never enqueued by the PHP template. When a user clicks Technique Match, the arcade loader polls for <code>window.JJGames["technique-match"]</code> and times out after 3 seconds, showing "Game module not found." The script simply needs to be registered alongside memory.js.</p>
+            </div>
+            <div class="detail-section">
+              <h4>Fix — Add to template-jiujitsu-arcade.php</h4>
+              <div class="code-block">$tm_path = jj_arcade_asset_path('games/technique-match.js');
+if (file_exists($tm_path)) {
+  wp_enqueue_script(
+    'jj-arcade-technique-match',
+    jj_arcade_asset_url('games/technique-match.js'),
+    ['jj-arcade-js'],
+    filemtime($tm_path),
+    true
+  );
+}</div>
+            </div>
+            <div class="detail-section">
+              <h4>Acceptance Criteria</h4>
+              <ul class="ac-list">
+                <li>Clicking "Technique Match" loads the game board</li>
+                <li>12 cards render (6 name + 6 description cards)</li>
+                <li>Matching name → description marks both as matched</li>
+                <li>Victory screen shows after all 6 pairs matched</li>
+                <li>No "module not found" error in console</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 1</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">🐛 Bug</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#ef4444">Critical</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">5 min</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">File(s)</span><span class="detail-meta-val">template-jiujitsu-arcade.php</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Fixed File</span><span class="detail-meta-val" style="color:#4ade80">✅ Provided below</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JJARC-003 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-task">T</div>
+        <div class="ticket-id">JJARC-003</div>
+        <div class="ticket-title">Remove duplicate <code style="font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;">loadGame()</code> function in jj-arcade.js
+          <small>Function defined twice — second definition silently overwrites the first</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-medium"><span class="prio-dot"></span>Medium</div>
+        <div class="effort">5 min</div>
+        <div class="file-tag">jj-arcade.js</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Description</h4>
+              <p class="detail-desc"><code>loadGame()</code> is declared twice in jj-arcade.js. Both are currently identical so it doesn't break anything, but it's a maintenance risk — if someone edits one and not the other you get subtle bugs. The first definition (which wraps <code>waitForModule</code>) should be kept, and the duplicate removed.</p>
+            </div>
+            <div class="detail-section">
+              <h4>Acceptance Criteria</h4>
+              <ul class="ac-list">
+                <li>Only one <code>loadGame()</code> definition exists in jj-arcade.js</li>
+                <li>The retained version uses <code>waitForModule()</code></li>
+                <li>All games still load correctly after edit</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 1</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">🔧 Task</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#eab308">Medium</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">5 min</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">File(s)</span><span class="detail-meta-val">jj-arcade.js</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JJARC-004 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-test">✓</div>
+        <div class="ticket-id">JJARC-004</div>
+        <div class="ticket-title">QA — Verify both games fully functional post-fix
+          <small>Full playthrough test on desktop + mobile before moving to Sprint 2</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-high"><span class="prio-dot"></span>High</div>
+        <div class="effort">20 min</div>
+        <div class="file-tag">Live site</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Test Checklist — Memory Game</h4>
+              <ul class="ac-list">
+                <li>All 12 cards render with GB logo on face-down</li>
+                <li>Clicking a card flips and shows character image</li>
+                <li>Matching pair stays flipped with gold outline</li>
+                <li>Non-matching pair flips back after 650ms</li>
+                <li>Question overlay appears after each match</li>
+                <li>All 3 answer choices clickable and dismiss overlay</li>
+                <li>Victory screen shows after 6 matches</li>
+                <li>Restart resets board correctly</li>
+                <li>Moves counter increments correctly</li>
+              </ul>
+            </div>
+            <div class="detail-section">
+              <h4>Test Checklist — Technique Match</h4>
+              <ul class="ac-list">
+                <li>Game loads without console errors</li>
+                <li>12 cards render (6 names + 6 descriptions)</li>
+                <li>Matching name+description pair stays flipped</li>
+                <li>Mismatched pair flips back</li>
+                <li>Victory screen after all 6 pairs</li>
+                <li>technique-match.json fetches correctly (check Network tab)</li>
+              </ul>
+            </div>
+            <div class="detail-section">
+              <h4>Mobile Test</h4>
+              <ul class="ac-list">
+                <li>Grid switches to 3-column at ≤600px</li>
+                <li>Question overlay fits screen width</li>
+                <li>All buttons tappable (no overlap)</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 1</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">✅ QA Test</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#f97316">High</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">20 min</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Blocker for</span><span class="detail-meta-val">Sprint 2</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /sprint1 -->
+
+  <!-- ── SPRINT 2 ── -->
+  <div class="sprint" id="sprint2">
+    <div class="sprint-header" onclick="toggleSprint('sprint2')">
+      <div class="sprint-left">
+        <span class="sprint-toggle">▼</span>
+        <span class="sprint-name">🟡 Sprint 2 — Belt Order Game</span>
+        <span class="sprint-meta">Est. 3–4 hrs · New build</span>
+      </div>
+      <div class="sprint-progress-wrap">
+        <div class="sprint-progress-bar"><div class="sprint-progress-fill" style="width:0%"></div></div>
+        <span class="sprint-pct">0%</span>
+      </div>
+    </div>
+    <div class="sprint-body">
+
+      <div style="display:grid;grid-template-columns:28px 90px 1fr 100px 100px 90px 80px;gap:12px;padding:8px 20px;border-bottom:1px solid var(--border);">
+        <div></div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">ID</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Title</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Status</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Priority</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Effort</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">File</div>
+      </div>
+
+      <!-- JJARC-005 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-data">D</div>
+        <div class="ticket-id">JJARC-005</div>
+        <div class="ticket-title">Build belt-order.json data file
+          <small>Define belt sequence, colors, and stripe data for drag-to-order game</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-high"><span class="prio-dot"></span>High</div>
+        <div class="effort">20 min</div>
+        <div class="file-tag">belt-order.json</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Description</h4>
+              <p class="detail-desc">Create the data file that defines the Gracie Barra Junior belt progression. The game will present belts in random order and the player must drag them into the correct sequence. Each belt entry needs an ID, display name, color, and sort order.</p>
+            </div>
+            <div class="detail-section">
+              <h4>Data Schema</h4>
+              <div class="code-block">{
+  "belts": [
+    { "id": "white",      "label": "White Belt",      "color": "#ffffff", "order": 1 },
+    { "id": "grey_white", "label": "Grey/White Belt",  "color": "#9ca3af", "order": 2 },
+    { "id": "grey",       "label": "Grey Belt",        "color": "#6b7280", "order": 3 },
+    { "id": "grey_black", "label": "Grey/Black Belt",  "color": "#374151", "order": 4 },
+    { "id": "yellow_white","label": "Yellow/White",    "color": "#fef08a", "order": 5 },
+    { "id": "yellow",     "label": "Yellow Belt",      "color": "#eab308", "order": 6 },
+    { "id": "yellow_black","label": "Yellow/Black",    "color": "#ca8a04", "order": 7 },
+    { "id": "orange_white","label": "Orange/White",    "color": "#fed7aa", "order": 8 },
+    { "id": "orange",     "label": "Orange Belt",      "color": "#f97316", "order": 9 },
+    { "id": "orange_black","label": "Orange/Black",    "color": "#ea580c", "order": 10 }
+  ]
+}</div>
+            </div>
+            <div class="detail-section">
+              <h4>Acceptance Criteria</h4>
+              <ul class="ac-list">
+                <li>JSON is valid (no syntax errors)</li>
+                <li>All 10 GB Junior belts represented in correct order</li>
+                <li>Each belt has id, label, color, and order fields</li>
+                <li>File is at <code>/data/belt-order.json</code></li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 2</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">📄 Data</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#f97316">High</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">20 min</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Blocks</span><span class="detail-meta-val">JJARC-006</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JJARC-006 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-feature">F</div>
+        <div class="ticket-id">JJARC-006</div>
+        <div class="ticket-title">Build belt-order.js game module
+          <small>Drag-and-drop belt sequencing game — player arranges shuffled belts in correct order</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-high"><span class="prio-dot"></span>High</div>
+        <div class="effort">2–3 hrs</div>
+        <div class="file-tag">belt-order.js</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Description</h4>
+              <p class="detail-desc">Build the belt order drag-and-drop game. Player sees shuffled belt cards and must drag them into the correct GB Junior belt progression sequence. Show visual feedback on correct/incorrect placement. Register as <code>window.JJGames["belt-order"]</code>.</p>
+            </div>
+            <div class="detail-section">
+              <h4>Game Flow</h4>
+              <ul class="ac-list">
+                <li>Load belt data from <code>dataUrl</code> in game config</li>
+                <li>Shuffle belts and render as draggable cards</li>
+                <li>Player drags cards into a numbered drop zone (1–10)</li>
+                <li>On submit: highlight correct (green) / incorrect (red)</li>
+                <li>Show score and "Try again" button</li>
+                <li>Stretch: reveal correct order on failure</li>
+              </ul>
+            </div>
+            <div class="detail-section">
+              <h4>Technical Notes</h4>
+              <ul class="ac-list">
+                <li>Use HTML5 Drag & Drop API (no external libs)</li>
+                <li>Register: <code>window.JJGames["belt-order"] = { mount }</code></li>
+                <li>Follow same mount(root, gameConfig) pattern as other games</li>
+                <li>Mobile: use touch events fallback or tap-to-select-and-place</li>
+              </ul>
+            </div>
+            <div class="detail-section">
+              <h4>Acceptance Criteria</h4>
+              <ul class="ac-list">
+                <li>Game loads when "Belt Order" is clicked in sidebar</li>
+                <li>All 10 belts displayed as draggable cards</li>
+                <li>Drag and drop works on desktop</li>
+                <li>Tap-to-place works on mobile</li>
+                <li>Score shown after submission</li>
+                <li>Restart resets the board</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 2</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">✨ Feature</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#f97316">High</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">2–3 hrs</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Depends on</span><span class="detail-meta-val">JJARC-005</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JJARC-007 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-task">T</div>
+        <div class="ticket-id">JJARC-007</div>
+        <div class="ticket-title">Register Belt Order in jj-arcade.json + PHP template
+          <small>Add game entry to config and enqueue the new .js module</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-medium"><span class="prio-dot"></span>Medium</div>
+        <div class="effort">10 min</div>
+        <div class="file-tag">2 files</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Changes Required</h4>
+              <div class="code-block">// jj-arcade.json → add to games array:
+{
+  "id": "belt-order",
+  "title": "Belt Order",
+  "description": "Arrange the belts in the correct progression order.",
+  "type": "belt-order",
+  "dataUrl": "/wp-content/themes/hello-elementor/assets/jj-arcade/data/belt-order.json"
+}
+
+// template-jiujitsu-arcade.php → add enqueue:
+$bo_path = jj_arcade_asset_path('games/belt-order.js');
+if (file_exists($bo_path)) {
+  wp_enqueue_script('jj-arcade-belt-order',
+    jj_arcade_asset_url('games/belt-order.js'),
+    ['jj-arcade-js'], filemtime($bo_path), true);
+}</div>
+            </div>
+            <div class="detail-section">
+              <h4>Acceptance Criteria</h4>
+              <ul class="ac-list">
+                <li>"Belt Order" appears in the game list sidebar</li>
+                <li>Clicking it loads the game (no module not found error)</li>
+                <li>belt-order.js enqueued in page source</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 2</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">🔧 Task</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#eab308">Medium</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">10 min</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Depends on</span><span class="detail-meta-val">JJARC-006</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /sprint2 -->
+
+  <!-- ── SPRINT 3 ── -->
+  <div class="sprint" id="sprint3">
+    <div class="sprint-header" onclick="toggleSprint('sprint3')">
+      <div class="sprint-left">
+        <span class="sprint-toggle">▼</span>
+        <span class="sprint-name">🟠 Sprint 3 — Reaction Tap Game</span>
+        <span class="sprint-meta">Est. 3–4 hrs · Uses body part assets</span>
+      </div>
+      <div class="sprint-progress-wrap">
+        <div class="sprint-progress-bar"><div class="sprint-progress-fill" style="width:0%"></div></div>
+        <span class="sprint-pct">0%</span>
+      </div>
+    </div>
+    <div class="sprint-body">
+
+      <div style="display:grid;grid-template-columns:28px 90px 1fr 100px 100px 90px 80px;gap:12px;padding:8px 20px;border-bottom:1px solid var(--border);">
+        <div></div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">ID</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Title</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Status</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Priority</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Effort</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">File</div>
+      </div>
+
+      <!-- JJARC-008 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-data">D</div>
+        <div class="ticket-id">JJARC-008</div>
+        <div class="ticket-title">Define reaction-tap.json — body part prompts + timing config
+          <small>Uses Professor_Andar.png, head.png, left_arm.png, right_arm.png, left_leg.png, right_leg.png</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-high"><span class="prio-dot"></span>High</div>
+        <div class="effort">20 min</div>
+        <div class="file-tag">reaction-tap.json</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Description</h4>
+              <p class="detail-desc">The cards folder already has body part images for Professor Andar: head, left_arm, right_arm, left_leg, right_leg. The game concept is: a body part label flashes on screen, the player must tap the correct body part on the Professor's diagram before the timer runs out. Data file defines the prompt set, timing, and difficulty levels.</p>
+            </div>
+            <div class="detail-section">
+              <h4>Data Schema</h4>
+              <div class="code-block">{
+  "character": "Professor_Andar",
+  "characterImage": "/wp-content/.../cards/Professor_Andar.png",
+  "rounds": 10,
+  "timePerRound": 3000,
+  "targets": [
+    { "id": "head",      "label": "Head",       "image": ".../head.png" },
+    { "id": "left_arm",  "label": "Left Arm",   "image": ".../left_arm.png" },
+    { "id": "right_arm", "label": "Right Arm",  "image": ".../right_arm.png" },
+    { "id": "left_leg",  "label": "Left Leg",   "image": ".../left_leg.png" },
+    { "id": "right_leg", "label": "Right Leg",  "image": ".../right_leg.png" }
+  ]
+}</div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 3</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">📄 Data</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#f97316">High</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">20 min</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Blocks</span><span class="detail-meta-val">JJARC-009</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JJARC-009 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-feature">F</div>
+        <div class="ticket-id">JJARC-009</div>
+        <div class="ticket-title">Build reaction-tap.js game module
+          <small>Timed body part identification game using Professor Andar assets</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-high"><span class="prio-dot"></span>High</div>
+        <div class="effort">3–4 hrs</div>
+        <div class="file-tag">reaction-tap.js</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Game Flow</h4>
+              <ul class="ac-list">
+                <li>Show Professor Andar image with body part zones highlighted</li>
+                <li>Flash a body part name at top (e.g., "Left Arm!")</li>
+                <li>Countdown timer (3 seconds) per round</li>
+                <li>Player taps the correct zone on the character</li>
+                <li>Correct = +1 point + green flash. Wrong/timeout = red flash</li>
+                <li>10 rounds, show final score with breakdown</li>
+              </ul>
+            </div>
+            <div class="detail-section">
+              <h4>Technical Notes</h4>
+              <ul class="ac-list">
+                <li>Register: <code>window.JJGames["reaction-tap"] = { mount }</code></li>
+                <li>Use CSS grid overlay on Professor image for tap zones</li>
+                <li>Countdown via <code>setInterval</code> with CSS progress bar</li>
+                <li>Touch events for mobile (kids will be on phones/tablets)</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 3</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">✨ Feature</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#f97316">High</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">3–4 hrs</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Depends on</span><span class="detail-meta-val">JJARC-008</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JJARC-010 -->
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-task">T</div>
+        <div class="ticket-id">JJARC-010</div>
+        <div class="ticket-title">Register Reaction Tap in jj-arcade.json + PHP template
+          <small>Add game entry to config and enqueue the new .js module</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-medium"><span class="prio-dot"></span>Medium</div>
+        <div class="effort">10 min</div>
+        <div class="file-tag">2 files</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section">
+              <h4>Same pattern as JJARC-007</h4>
+              <div class="code-block">// jj-arcade.json → add to games array:
+{
+  "id": "reaction-tap",
+  "title": "Reaction Tap",
+  "description": "Tap the correct body part before time runs out!",
+  "type": "reaction-tap",
+  "dataUrl": "/wp-content/themes/hello-elementor/assets/jj-arcade/data/reaction-tap.json"
+}
+
+// template-jiujitsu-arcade.php → add enqueue:
+$rt_path = jj_arcade_asset_path('games/reaction-tap.js');
+if (file_exists($rt_path)) {
+  wp_enqueue_script('jj-arcade-reaction-tap',
+    jj_arcade_asset_url('games/reaction-tap.js'),
+    ['jj-arcade-js'], filemtime($rt_path), true);
+}</div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section">
+              <h4>Metadata</h4>
+              <div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 3</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">🔧 Task</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Priority</span><span class="detail-meta-val" style="color:#eab308">Medium</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">10 min</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-key">Depends on</span><span class="detail-meta-val">JJARC-009</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /sprint3 -->
+
+  <!-- ── SPRINT 4 ── -->
+  <div class="sprint collapsed" id="sprint4">
+    <div class="sprint-header" onclick="toggleSprint('sprint4')">
+      <div class="sprint-left">
+        <span class="sprint-toggle">▼</span>
+        <span class="sprint-name">🔵 Sprint 4 — UI Polish + Infrastructure</span>
+        <span class="sprint-meta">Est. 2–3 hrs · Quality pass</span>
+      </div>
+      <div class="sprint-progress-wrap">
+        <div class="sprint-progress-bar"><div class="sprint-progress-fill" style="width:0%"></div></div>
+        <span class="sprint-pct">0%</span>
+      </div>
+    </div>
+    <div class="sprint-body">
+      <div style="display:grid;grid-template-columns:28px 90px 1fr 100px 100px 90px 80px;gap:12px;padding:8px 20px;border-bottom:1px solid var(--border);">
+        <div></div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">ID</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Title</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Status</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Priority</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Effort</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">File</div>
+      </div>
+
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-task">T</div>
+        <div class="ticket-id">JJARC-011</div>
+        <div class="ticket-title">Active state styling on selected game in sidebar
+          <small>Currently no visual indicator for which game is active</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-medium"><span class="prio-dot"></span>Medium</div>
+        <div class="effort">30 min</div>
+        <div class="file-tag">jj-arcade.css/js</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-section"><h4>Description</h4><p class="detail-desc">When a game button is clicked, it should highlight with a border/background to show it's the active game. Currently all buttons look identical regardless of selection state.</p></div>
+            <div class="detail-section"><h4>Acceptance Criteria</h4><ul class="ac-list"><li>Clicked game button gets an active class with red left border</li><li>Previous active button deactivates on new selection</li><li>Active style clear and accessible (not just color-based)</li></ul></div>
+          </div>
+          <div><div class="detail-section"><h4>Metadata</h4><div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 4</span></div><div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">🔧 Task</span></div><div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">30 min</span></div></div></div>
+        </div>
+      </div>
+
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-task">T</div>
+        <div class="ticket-id">JJARC-012</div>
+        <div class="ticket-title">Difficulty badge + age range tag in sidebar
+          <small>Show ★ difficulty rating and age badge (e.g. "Ages 5+") per game</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-low"><span class="prio-dot"></span>Low</div>
+        <div class="effort">45 min</div>
+        <div class="file-tag">jj-arcade.js/css</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div><div class="detail-section"><h4>Description</h4><p class="detail-desc">Each game in jj-arcade.json should support optional <code>difficulty</code> (1–5) and <code>ageRange</code> fields. The arcade sidebar should render these as visual badges below the description.</p></div><div class="detail-section"><h4>JSON Addition</h4><div class="code-block">{ "id": "memory", ..., "difficulty": 1, "ageRange": "5+" }</div></div></div>
+          <div><div class="detail-section"><h4>Metadata</h4><div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 4</span></div><div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">45 min</span></div></div></div>
+        </div>
+      </div>
+
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-task">T</div>
+        <div class="ticket-id">JJARC-013</div>
+        <div class="ticket-title">Full mobile responsive pass — all 4 games
+          <small>Test and fix touch interactions, layout breakpoints, tap target sizes</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-high"><span class="prio-dot"></span>High</div>
+        <div class="effort">1–2 hrs</div>
+        <div class="file-tag">jj-arcade.css</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div><div class="detail-section"><h4>Test Devices</h4><ul class="ac-list"><li>iPhone SE (375px) — smallest target</li><li>iPad (768px) — common student device</li><li>Android phone (360px)</li></ul></div><div class="detail-section"><h4>Known Issues to Fix</h4><ul class="ac-list"><li>Sidebar collapses to top on mobile (check layout)</li><li>Card tap zones large enough for kids' fingers (min 44px)</li><li>Question overlay doesn't overflow screen</li><li>Reaction Tap: touch events on character zones</li></ul></div></div>
+          <div><div class="detail-section"><h4>Metadata</h4><div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 4</span></div><div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">1–2 hrs</span></div></div></div>
+        </div>
+      </div>
+
+      <div class="ticket" onclick="toggleTicket(this)">
+        <div class="ticket-type type-test">✓</div>
+        <div class="ticket-id">JJARC-014</div>
+        <div class="ticket-title">Final QA pass — all 4 games, full regression test
+          <small>Sign-off checklist before project is considered complete</small>
+        </div>
+        <div><span class="status-pill s-todo">To Do</span></div>
+        <div class="priority prio-high"><span class="prio-dot"></span>High</div>
+        <div class="effort">1 hr</div>
+        <div class="file-tag">Live site</div>
+      </div>
+      <div class="ticket-detail">
+        <div class="detail-grid">
+          <div><div class="detail-section"><h4>Final Sign-Off Checklist</h4><ul class="ac-list"><li>Memory Game — images render, questions fire, victory works</li><li>Technique Match — loads, matching logic correct</li><li>Belt Order — drag works, scoring correct</li><li>Reaction Tap — timer, correct/wrong feedback, score</li><li>All games work on mobile (iOS + Android)</li><li>No JS errors in browser console</li><li>Page loads in under 3 seconds</li><li>Images optimized (card images are 370KB+ each — consider WebP conversion)</li></ul></div></div>
+          <div><div class="detail-section"><h4>Metadata</h4><div class="detail-meta-item"><span class="detail-meta-key">Sprint</span><span class="detail-meta-val">Sprint 4</span></div><div class="detail-meta-item"><span class="detail-meta-key">Type</span><span class="detail-meta-val">✅ QA</span></div><div class="detail-meta-item"><span class="detail-meta-key">Effort</span><span class="detail-meta-val">1 hr</span></div><div class="detail-meta-item"><span class="detail-meta-key">Blocker for</span><span class="detail-meta-val">Launch ✅</span></div></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /sprint4 -->
+
+</div><!-- /view-board -->
+
+
+<!-- ══════════════════════════════════════
+     KANBAN VIEW
+═══════════════════════════════════════ -->
+<div id="view-kanban" class="view">
+  <div class="kanban" id="kanban-board"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BUG TRACKER VIEW
+═══════════════════════════════════════ -->
+<div id="view-bugs" class="view">
+  <p class="section-title">🔴 Active Bugs</p>
+  <table class="bug-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Bug</th>
+        <th>File</th>
+        <th>Root Cause</th>
+        <th>Fix</th>
+        <th>Impact</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span style="font-family:monospace;color:#9ca3af">JJARC-001</span></td>
+        <td><strong>Card images not showing</strong><br><small style="color:#6b7280">Memory cards all show GB logo, character images never appear</small></td>
+        <td><span class="file-tag">jj-arcade.json</span></td>
+        <td style="font-size:12px;color:#9ca3af"><code>cardFront</code> property missing from JSON config. <code>memory.js</code> reads <code>window.JJ_ARCADE_CONFIG.cardFront</code> which is <code>undefined</code>.</td>
+        <td style="font-size:12px;">Add <code>"cardFront": "/wp-content/.../gb_3d_logo.png"</code> to <code>jj-arcade.json</code> top level</td>
+        <td><span class="impact-badge impact-critical">Critical</span></td>
+        <td><span class="status-pill s-todo">To Do</span></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:monospace;color:#9ca3af">JJARC-002</span></td>
+        <td><strong>Technique Match never loads</strong><br><small style="color:#6b7280">Clicking game shows "module not found" after 3s timeout</small></td>
+        <td><span class="file-tag">template.php</span></td>
+        <td style="font-size:12px;color:#9ca3af"><code>technique-match.js</code> is never passed to <code>wp_enqueue_script()</code> in the PHP template. Script never loads, so <code>window.JJGames["technique-match"]</code> is always undefined.</td>
+        <td style="font-size:12px;">Add <code>wp_enqueue_script('jj-arcade-technique-match', ...)</code> block to PHP template</td>
+        <td><span class="impact-badge impact-critical">Critical</span></td>
+        <td><span class="status-pill s-todo">To Do</span></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:monospace;color:#9ca3af">JJARC-003</span></td>
+        <td><strong>Duplicate loadGame() function</strong><br><small style="color:#6b7280">Function defined twice, second overwrites first silently</small></td>
+        <td><span class="file-tag">jj-arcade.js</span></td>
+        <td style="font-size:12px;color:#9ca3af">Both definitions are currently identical so no immediate break, but creates maintenance trap if one is later edited without updating the other.</td>
+        <td style="font-size:12px;">Remove the second <code>loadGame()</code> definition (keep the one that calls <code>waitForModule</code>)</td>
+        <td><span class="impact-badge impact-medium">Medium</span></td>
+        <td><span class="status-pill s-todo">To Do</span></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:monospace;color:#9ca3af">PERF-001</span></td>
+        <td><strong>Card images too large</strong><br><small style="color:#6b7280">Junior_Champ + Little_Champ cards are ~370KB each PNG</small></td>
+        <td><span class="file-tag">/cards/*.png</span></td>
+        <td style="font-size:12px;color:#9ca3af">Images not optimized. 6 unique card images × 2 = 12 card loads per game. At ~370KB each = ~4.4MB per game load on mobile.</td>
+        <td style="font-size:12px;">Convert to WebP format + resize to max 400×400px. Target ≤60KB per card image.</td>
+        <td><span class="impact-badge impact-high">High</span></td>
+        <td><span class="status-pill s-todo">To Do</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="section-title">✅ Fixed (Ready to Upload)</p>
+  <table class="bug-table">
+    <thead><tr><th>ID</th><th>Bug</th><th>Fix Applied</th><th>File</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span style="font-family:monospace;color:#9ca3af">JJARC-001</span></td>
+        <td>cardFront missing from JSON</td>
+        <td style="color:#4ade80">Added <code>"cardFront"</code> property pointing to gb_3d_logo.png</td>
+        <td><span class="file-tag" style="color:#4ade80;border-color:#15803d">jj-arcade.json ✅</span></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:monospace;color:#9ca3af">JJARC-002</span></td>
+        <td>technique-match.js not enqueued</td>
+        <td style="color:#4ade80">Added wp_enqueue_script block for technique-match.js</td>
+        <td><span class="file-tag" style="color:#4ade80;border-color:#15803d">template.php ✅</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUMMARY VIEW
+═══════════════════════════════════════ -->
+<div id="view-summary" class="view">
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-card-num" style="color:#ef4444">2</div>
+      <div class="summary-card-label">Critical Bugs</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-num" style="color:#60a5fa">14</div>
+      <div class="summary-card-label">Total Tickets</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-num" style="color:#fbbf24">~12 hrs</div>
+      <div class="summary-card-label">Total Effort Est.</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-num" style="color:#4ade80">4</div>
+      <div class="summary-card-label">Sprints</div>
+    </div>
+  </div>
+
+  <p class="section-title">Sprint Overview</p>
+  <table class="bug-table">
+    <thead><tr><th>Sprint</th><th>Goal</th><th>Tickets</th><th>Est. Time</th><th>Outcome</th></tr></thead>
+    <tbody>
+      <tr><td>Sprint 1</td><td>Fix both critical bugs + QA</td><td>JJARC-001 → 004</td><td>~1 hr</td><td>Both existing games fully working</td></tr>
+      <tr><td>Sprint 2</td><td>Build Belt Order game</td><td>JJARC-005 → 007</td><td>3–4 hrs</td><td>3rd game live</td></tr>
+      <tr><td>Sprint 3</td><td>Build Reaction Tap game</td><td>JJARC-008 → 010</td><td>3–4 hrs</td><td>4th game live — arcade complete</td></tr>
+      <tr><td>Sprint 4</td><td>Polish + mobile + final QA</td><td>JJARC-011 → 014</td><td>2–3 hrs</td><td>Production-ready, fully tested</td></tr>
+    </tbody>
+  </table>
+
+  <p class="section-title">File Map</p>
+  <table class="bug-table">
+    <thead><tr><th>File</th><th>Status</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>template-jiujitsu-arcade.php</code></td><td><span class="status-pill s-todo">Fix Ready</span></td><td>technique-match.js enqueue added</td></tr>
+      <tr><td><code>jj-arcade.json</code></td><td><span class="status-pill s-todo">Fix Ready</span></td><td>cardFront property added</td></tr>
+      <tr><td><code>jj-arcade.js</code></td><td><span class="status-pill s-review">Minor Fix</span></td><td>Remove duplicate loadGame()</td></tr>
+      <tr><td><code>jj-arcade.css</code></td><td><span class="status-pill s-done">Good</span></td><td>No changes needed</td></tr>
+      <tr><td><code>memory.js</code></td><td><span class="status-pill s-done">Good</span></td><td>Logic sound, works after JSON fix</td></tr>
+      <tr><td><code>technique-match.js</code></td><td><span class="status-pill s-done">Good</span></td><td>Works after PHP template fix</td></tr>
+      <tr><td><code>belt-order.js</code></td><td><span class="status-pill s-todo">Not Built</span></td><td>Sprint 2 — needs full build</td></tr>
+      <tr><td><code>belt-order.json</code></td><td><span class="status-pill s-todo">Not Built</span></td><td>Sprint 2 — data file needed</td></tr>
+      <tr><td><code>reaction-tap.js</code></td><td><span class="status-pill s-todo">Not Built</span></td><td>Sprint 3 — needs full build</td></tr>
+      <tr><td><code>reaction-tap.json</code></td><td><span class="status-pill s-todo">Not Built</span></td><td>Sprint 3 — data file needed</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ── View switching
+function switchView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'kanban') buildKanban();
+}
+
+// ── Sprint toggle
+function toggleSprint(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ── Ticket expand
+function toggleTicket(el) {
+  const isExpanded = el.classList.contains('expanded');
+  // Close all
+  document.querySelectorAll('.ticket.expanded').forEach(t => t.classList.remove('expanded'));
+  if (!isExpanded) el.classList.add('expanded');
+}
+
+// ── Build Kanban from board data
+const ticketData = [
+  { id:'JJARC-001', title:'Add cardFront to jj-arcade.json', status:'todo', sprint:'S1', type:'bug' },
+  { id:'JJARC-002', title:'Enqueue technique-match.js in PHP', status:'todo', sprint:'S1', type:'bug' },
+  { id:'JJARC-003', title:'Remove duplicate loadGame()', status:'todo', sprint:'S1', type:'task' },
+  { id:'JJARC-004', title:'QA — verify both games post-fix', status:'todo', sprint:'S1', type:'test' },
+  { id:'JJARC-005', title:'Build belt-order.json data file', status:'todo', sprint:'S2', type:'data' },
+  { id:'JJARC-006', title:'Build belt-order.js game module', status:'todo', sprint:'S2', type:'feature' },
+  { id:'JJARC-007', title:'Register Belt Order in config + PHP', status:'todo', sprint:'S2', type:'task' },
+  { id:'JJARC-008', title:'Define reaction-tap.json', status:'todo', sprint:'S3', type:'data' },
+  { id:'JJARC-009', title:'Build reaction-tap.js game module', status:'todo', sprint:'S3', type:'feature' },
+  { id:'JJARC-010', title:'Register Reaction Tap in config + PHP', status:'todo', sprint:'S3', type:'task' },
+  { id:'JJARC-011', title:'Active state styling on sidebar', status:'todo', sprint:'S4', type:'task' },
+  { id:'JJARC-012', title:'Difficulty badge + age range tag', status:'todo', sprint:'S4', type:'task' },
+  { id:'JJARC-013', title:'Full mobile responsive pass', status:'todo', sprint:'S4', type:'task' },
+  { id:'JJARC-014', title:'Final QA pass — all 4 games', status:'todo', sprint:'S4', type:'test' },
+];
+
+const typeLabels = { bug:'B', feature:'F', task:'T', data:'D', test:'✓' };
+const typeClasses = { bug:'type-bug', feature:'type-feature', task:'type-task', data:'type-data', test:'type-test' };
+const columns = [
+  { key:'todo', label:'To Do', color:'#9ca3af' },
+  { key:'progress', label:'In Progress', color:'#60a5fa' },
+  { key:'review', label:'In Review', color:'#c084fc' },
+  { key:'done', label:'Done', color:'#4ade80' },
+  { key:'blocked', label:'Blocked', color:'#f87171' },
+];
+
+function buildKanban() {
+  const board = document.getElementById('kanban-board');
+  if (board.children.length) return; // already built
+  columns.forEach(col => {
+    const tickets = ticketData.filter(t => t.status === col.key);
+    const colEl = document.createElement('div');
+    colEl.className = 'kanban-col';
+    colEl.innerHTML = `
+      <div class="kanban-col-header">
+        <span class="kanban-col-title" style="color:${col.color}">${col.label}</span>
+        <span class="kanban-count">${tickets.length}</span>
+      </div>
+      ${tickets.map(t => `
+        <div class="kanban-card">
+          <div class="kanban-card-id">${t.id}</div>
+          <div class="kanban-card-title">
+            <span class="ticket-type ${typeClasses[t.type]}" style="display:inline-flex;width:18px;height:18px;font-size:10px;margin-right:6px;vertical-align:middle;">${typeLabels[t.type]}</span>
+            ${t.title}
+          </div>
+          <div class="kanban-card-footer">
+            <span class="kanban-sprint-tag">${t.sprint}</span>
+          </div>
+        </div>
+      `).join('')}
+      ${tickets.length === 0 ? '<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px 0;">Empty</div>' : ''}
+    `;
+    board.appendChild(colEl);
+  });
+}
+</script>
+</body>
+</html>
