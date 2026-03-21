@@ -1,0 +1,26 @@
+name: Deploy to IONOS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy arcade files to IONOS via SFTP
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Deploy via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          local_path: ./hello-theme-child-master/*
+          remote_path: /clickandbuilds/GracieBarraLakeCountryJiuJitsu/wp-content/themes/hello-theme-child-master
+          sftp_only: true
+          delete_remote_files: false
