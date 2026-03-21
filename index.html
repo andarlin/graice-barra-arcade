@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gracie Barra Arcade</title>
+  <link rel="stylesheet" href="jj-arcade.css" />
+  <link rel="stylesheet" href="jj-memory-game.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: system-ui, sans-serif;
+      background: #f8fafc;
+    }
+
+    /* Wrapper fills the full viewport */
+    .jj-arcade-wrapper {
+      height: 100vh;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Arcade card fills wrapper, no overflow on the outer box */
+    .jj-arcade {
+      flex: 1;
+      min-height: 0;
+      display: flex !important;
+      flex-direction: column;
+      padding: 14px 18px !important;
+      overflow: hidden;
+    }
+
+    /* Shrink header text a bit */
+    .jj-arcade__header h1 { font-size: 20px !important; margin-bottom: 2px !important; }
+    .jj-arcade__header p  { font-size: 13px !important; margin-bottom: 8px !important; }
+
+    /* Layout fills remaining height */
+    .jj-arcade__layout {
+      flex: 1;
+      min-height: 0;
+      grid-template-columns: 220px 1fr !important;
+      gap: 12px !important;
+    }
+
+    /* Stage scrolls internally if ever needed */
+    .jj-arcade__stage {
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    /* Board constrained so all cards are visible at once */
+    .jj-memory__board {
+      gap: 8px !important;
+      max-width: 100% !important;
+      /* 3 rows of cards × card height + gaps should fit in viewport */
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+
+    .jj-memory__stats { margin-bottom: 8px !important; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+  <div class="jj-arcade-wrapper">
+    <main class="jj-arcade">
+      <section class="jj-arcade__header">
+        <h1 id="jj-arcade-title"></h1>
+        <p id="jj-arcade-subtitle"></p>
+      </section>
+
+      <section class="jj-arcade__layout">
+        <aside class="jj-arcade__sidebar">
+          <h2>Games</h2>
+          <div id="jj-arcade-game-list" class="jj-arcade__game-list"></div>
+        </aside>
+
+        <section class="jj-arcade__stage">
+          <div id="jj-arcade-stage"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <!-- Config must be set before jj-arcade.js runs -->
+  <script>
+    window.JJ_ARCADE_CONFIG = {
+      "brand": "gblc",
+      "pageTitle": "Jiu-Jitsu Arcade",
+      "pageSubtitle": "Fun + skill-building games for students and families.",
+      "cardFront": "./jj-card-junior-1.png",
+      "games": [
+        {
+          "id": "memory",
+          "title": "GB Junior 1 Memory Game",
+          "description": "Match the Junior 1 characters and unlock a Jiu-Jitsu question.",
+          "type": "memory",
+          "pairs": 6,
+          "cards": [
+            { "id": "junior_1", "label": "Junior Champ 1", "image": "./Junior_Champ_1.png" },
+            { "id": "junior_2", "label": "Junior Champ 2", "image": "./Junior_Champ_2.png" },
+            { "id": "junior_3", "label": "Junior Champ 3", "image": "./Junior_Champ_3.png" },
+            { "id": "junior_4", "label": "Junior Champ 4", "image": "./Junior_Champ_4.png" },
+            { "id": "little_1", "label": "Little Champ 1", "image": "./Little_Champ_1.png" },
+            { "id": "little_2", "label": "Little Champ 2", "image": "./Little_Champ_2.png" }
+          ],
+          "questions": [
+            { "q": "What is one thing you do to be a great training partner?", "choices": ["Be safe", "Be respectful", "Help others learn"] },
+            { "q": "What position do you feel most confident in right now?", "choices": ["Closed guard", "Mount", "Side control"] },
+            { "q": "What is one goal you want to achieve this month?", "choices": ["Train more", "Learn a new move", "Get stronger"] },
+            { "q": "What is your favorite warm-up drill and why?", "choices": ["Shrimping", "Bear crawls", "Forward rolls"] },
+            { "q": "If you could improve one skill instantly, what would it be?", "choices": ["Escapes", "Guard retention", "Takedowns"] }
+          ]
+        },
+        {
+          "id": "technique-match",
+          "title": "Technique Match",
+          "description": "Match the technique name to its description.",
+          "type": "technique-match",
+          "pairs": 6,
+          "dataUrl": "./technique-match.json"
+        }
+      ]
+    };
+  </script>
+
+  <!-- Load game modules before the arcade loader so they are registered in time -->
+  <script src="memory.js"></script>
+  <script src="technique-match.js"></script>
+  <script src="jj-arcade.js"></script>
+
+</body>
+</html>
