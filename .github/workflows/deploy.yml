@@ -14,13 +14,29 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Deploy via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        with:
-          server: ${{ secrets.SFTP_HOST }}
-          username: ${{ secrets.SFTP_USERNAME }}
-          password: ${{ secrets.SFTP_PASSWORD }}
-          local_path: ./hello-theme-child-master/*
-          remote_path: /clickandbuilds/GracieBarraLakeCountryJiuJitsu/wp-content/themes/hello-theme-child-master
-          sftp_only: true
-          delete_remote_files: false
+      - name: List files to verify structure
+        run: |
+          echo "=== Repo root ==="
+          ls -la
+          echo "=== hello-theme-child-master ==="
+          ls -la hello-theme-child-master/ || echo "FOLDER NOT FOUND"
+          echo "=== games folder ==="
+          ls -la hello-theme-child-master/assets/jj-arcade/games/ || echo "GAMES FOLDER NOT FOUND"
+
+      - name: Install lftp
+        run: sudo apt-get install -y lftp
+
+      - name: Deploy via SFTP using lftp
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+        run: |
+          lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" sftp://"$SFTP_HOST" << 'LFTP_EOF'
+          set sftp:auto-confirm yes
+          set net:timeout 30
+          mirror --reverse --verbose \
+            hello-theme-child-master \
+            /clickandbuilds/GracieBarraLakeCountryJiuJitsu/wp-content/themes/hello-theme-child-master
+          bye
+          LFTP_EOF
