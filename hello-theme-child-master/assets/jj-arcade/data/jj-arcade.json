@@ -5,72 +5,53 @@
   "games": [
     {
       "id": "memory",
-      "title": "GB Junior 1 Memory Game",
+      "title": "Memory Game",
+      "icon": "🃏",
       "description": "Match the Junior 1 characters and unlock a Jiu-Jitsu question.",
       "type": "memory",
       "pairs": 6,
+      "cardFront": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/gb_3d_logo.png",
       "cards": [
-        {
-          "id": "junior_1",
-          "label": "Junior Champ 1",
-          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Junior_Champ_1.png"
-        },
-        {
-          "id": "junior_2",
-          "label": "Junior Champ 2",
-          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Junior_Champ_2.png"
-        },
-        {
-          "id": "junior_3",
-          "label": "Junior Champ 3",
-          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Junior_Champ_3.png"
-        },
-        {
-          "id": "junior_4",
-          "label": "Junior Champ 4",
-          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Junior_Champ_4.png"
-        },
-        {
-          "id": "little_1",
-          "label": "Little Champ 1",
-          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Little_Champ_1.png"
-        },
-        {
-          "id": "little_2",
-          "label": "Little Champ 2",
-          "image": "/wp-content/themes/hello-elementor/assets/jj-arcade/cards/Little_Champ_2.png"
-        }
+        { "id": "junior_1", "label": "Junior Champ 1", "image": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/Junior_Champ_1.png" },
+        { "id": "junior_2", "label": "Junior Champ 2", "image": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/Junior_Champ_2.png" },
+        { "id": "junior_3", "label": "Junior Champ 3", "image": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/Junior_Champ_3.png" },
+        { "id": "junior_4", "label": "Junior Champ 4", "image": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/Junior_Champ_4.png" },
+        { "id": "little_1", "label": "Little Champ 1", "image": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/Little_Champ_1.png" },
+        { "id": "little_2", "label": "Little Champ 2", "image": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/Little_Champ_2.png" }
       ],
       "questions": [
-        {
-          "q": "What is one thing you do to be a great training partner?",
-          "choices": ["Be safe", "Be respectful", "Help others learn"]
-        },
-        {
-          "q": "What position do you feel most confident in right now?",
-          "choices": ["Closed guard", "Mount", "Side control"]
-        },
-        {
-          "q": "What is one goal you want to achieve this month?",
-          "choices": ["Train more", "Learn a new move", "Get stronger"]
-        },
-        {
-          "q": "What is your favorite warm-up drill and why?",
-          "choices": ["Shrimping", "Bear crawls", "Forward rolls"]
-        },
-        {
-          "q": "If you could improve one skill instantly, what would it be?",
-          "choices": ["Escapes", "Guard retention", "Takedowns"]
-        }
+        { "q": "What is one thing you do to be a great training partner?", "choices": ["Be safe", "Be respectful", "Help others learn"] },
+        { "q": "What position do you feel most confident in right now?", "choices": ["Closed guard", "Mount", "Side control"] },
+        { "q": "What is one goal you want to achieve this month?", "choices": ["Train more", "Learn a new move", "Get stronger"] },
+        { "q": "What is your favorite warm-up drill and why?", "choices": ["Shrimping", "Bear crawls", "Forward rolls"] },
+        { "q": "If you could improve one skill instantly, what would it be?", "choices": ["Escapes", "Guard retention", "Takedowns"] }
       ]
     },
     {
       "id": "technique-match",
       "title": "Technique Match",
+      "icon": "🥋",
       "description": "Match the technique name to its description.",
       "type": "technique-match",
       "pairs": 6,
-      "dataUrl": "/wp-content/themes/hello-elementor/assets/jj-arcade/data/technique-match.json"
+      "cardFront": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/jj-card-technique-match.png",
+      "dataUrl": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/data/technique-match.json"
+    },
+    {
+      "id": "hangman",
+      "title": "JJ Hangman",
+      "icon": "🔤",
+      "description": "Guess the BJJ word before Andar is defeated!",
+      "type": "hangman",
+      "dataUrl": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/data/hangman.json"
+    },
+    {
+      "id": "belt-order",
+      "title": "Belt Order",
+      "icon": "🏅",
+      "description": "Sort the belts in the correct order from white to black!",
+      "type": "belt-order",
+      "dataUrl": "/wp-content/themes/hello-theme-child-master/assets/jj-arcade/data/belt-order.json"
     }
   ]
 }

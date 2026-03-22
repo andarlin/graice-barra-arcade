@@ -1,0 +1,26 @@
+{
+  "modes": {
+    "kids": {
+      "label": "Future Champions",
+      "description": "Order the belts from beginner to advanced!",
+      "belts": [
+        { "id": "white",  "label": "White Belt",  "rank": 1, "image": "white-belt.png" },
+        { "id": "grey",   "label": "Grey Belt",   "rank": 2, "image": "grey-belt.png" },
+        { "id": "yellow", "label": "Yellow Belt", "rank": 3, "image": "yellow-belt.png" },
+        { "id": "orange", "label": "Orange Belt", "rank": 4, "image": "orange-belt.png" },
+        { "id": "green",  "label": "Green Belt",  "rank": 5, "image": "green-belt.png" }
+      ]
+    },
+    "adult": {
+      "label": "Adult Belts",
+      "description": "Order the belts from beginner to black belt!",
+      "belts": [
+        { "id": "white",  "label": "White Belt",  "rank": 1, "image": "white-belt.png" },
+        { "id": "blue",   "label": "Blue Belt",   "rank": 2, "image": "blue-belt.png" },
+        { "id": "purple", "label": "Purple Belt", "rank": 3, "image": "purple-belt.png" },
+        { "id": "brown",  "label": "Brown Belt",  "rank": 4, "image": "brown-belt.png" },
+        { "id": "black",  "label": "Black Belt",  "rank": 5, "image": "black-belt.png" }
+      ]
+    }
+  }
+}
