@@ -1,12 +1,27 @@
 /**
- * JJA-013-FIX — Reaction Tap v4.1
+ * JJA-015 — Reaction Tap v4.3
  * Gracie Barra Lake Country Jiu-Jitsu Arcade
  *
- * FIXES:
- *   - Guard against empty/0-byte JSON (shows clear error instead of silent crash)
- *   - Double-fire bug: stage pointerup + button click both calling _answer()
- *   - Mobile button truncation: flex-column on narrow screens, full text visible
- *   - Button font-size and padding improved for mobile tap targets
+ * FIXES v4.3:
+ *   1. START ROLLING phantom tap — overlay pointerdown bubbles through to stage
+ *      after overlay is removed in the same gesture. Fixed with a _startedAt
+ *      timestamp guard: _answer() ignores all input for 500ms after game start.
+ *
+ *   2. Every button tap = WRONG — the stage 'click' fallback listener was
+ *      catching the synthetic click Android fires after pointerdown on a button,
+ *      calling _answer('position') after the button already answered.
+ *      Fixed by removing the 'click' fallback entirely. touchend handles mobile,
+ *      pointerdown (mouse only) handles desktop — no click listener needed.
+ *
+ *   3. TAP POSITION button restored — removes ambiguity about stage tap intent
+ *      on mobile. Both answers now have explicit, large tap targets. Stage tap
+ *      still works as a third way to answer position.
+ *
+ * PRESERVED from v4.2:
+ *   - passive touchstart + touchend scroll-delta guard (scroll lock fix)
+ *   - touch-action: manipulation on stage (not 'none')
+ *   - _answering lock (double-fire guard)
+ *   - 0-byte JSON guard
  *
  * window.JJGames['reaction-tap'].mount(rootEl, cfg)
  * cfg = { dataUrl, assetBase }
@@ -39,15 +54,15 @@
 
   // ── CSS ───────────────────────────────────────────────────────────────────
   var CSS = [
-    '.rt-wrap{font-family:\'Oswald\',\'Arial Narrow\',Arial,sans-serif;max-width:520px;margin:0 auto;padding:12px;box-sizing:border-box;user-select:none;-webkit-user-select:none;position:relative;overflow:hidden;}',
+    '.rt-wrap{font-family:\'Oswald\',\'Arial Narrow\',Arial,sans-serif;max-width:520px;margin:0 auto;padding:12px;box-sizing:border-box;user-select:none;-webkit-user-select:none;position:relative;}',
     '.rt-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}',
     '.rt-score{font-size:1.6rem;font-weight:700;color:#c0392b;letter-spacing:1px;}',
     '.rt-combo{font-size:1rem;color:#e67e22;font-weight:600;min-height:1.4em;text-align:center;}',
     '.rt-lives{font-size:1.4rem;letter-spacing:3px;}',
 
-    /* Stage — taller on mobile so overlay content fits */
-    '.rt-stage{position:relative;width:100%;aspect-ratio:4/3;background:#1a1a2e;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;touch-action:none;}',
-    '@media(max-width:480px){.rt-stage{aspect-ratio:unset;min-height:340px;}}',
+    /* touch-action: manipulation — allows taps, does NOT kill page scroll */
+    '.rt-stage{position:relative;width:100%;aspect-ratio:4/3;background:#1a1a2e;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;touch-action:manipulation;cursor:pointer;}',
+    '@media(max-width:480px){.rt-stage{aspect-ratio:unset;min-height:300px;}}',
     '.rt-stage img{max-width:100%;max-height:100%;object-fit:contain;pointer-events:none;}',
     '.rt-stage.rt-correct{outline:6px solid #27ae60;}',
     '.rt-stage.rt-wrong{outline:6px solid #c0392b;animation:rt-shake 0.35s ease;}',
@@ -69,15 +84,15 @@
     /* Instruction row */
     '.rt-instruction{text-align:center;font-size:0.88rem;color:#666;margin:8px 0 6px;line-height:1.5;}',
 
-    /* Two-button row — stacks on mobile */
+    /* Two-button row */
     '.rt-btn-row{display:flex;gap:10px;margin-top:6px;}',
 
-    /* TAP POSITION button */
+    /* POSITION button */
     '.rt-img-btn{flex:1;padding:18px 10px;background:#2c3e50;color:#fff;font-family:inherit;font-size:1rem;font-weight:700;letter-spacing:1px;border:none;border-radius:10px;cursor:pointer;text-transform:uppercase;transition:background 0.15s,transform 0.1s;touch-action:manipulation;white-space:normal;text-align:center;line-height:1.2;}',
     '.rt-img-btn:active{background:#1a252f;transform:scale(0.97);}',
     '.rt-img-btn.rt-btn-highlight{background:#27ae60;}',
 
-    /* TAP TO SUBMIT button */
+    /* SUBMISSION button */
     '.rt-sub-btn{flex:1;padding:18px 10px;background:#c0392b;color:#fff;font-family:inherit;font-size:1rem;font-weight:700;letter-spacing:1px;border:none;border-radius:10px;cursor:pointer;text-transform:uppercase;transition:background 0.15s,transform 0.1s;touch-action:manipulation;white-space:normal;text-align:center;line-height:1.2;}',
     '.rt-sub-btn:active{background:#96211b;transform:scale(0.97);}',
     '.rt-sub-btn.rt-btn-highlight{background:#c0392b;box-shadow:0 0 16px rgba(192,57,43,0.7);}',
@@ -87,7 +102,7 @@
     '.rt-overlay h2{color:#fff;font-size:1.6rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;margin:0;text-align:center;flex-shrink:0;}',
     '.rt-overlay .rt-final-score{font-size:2.6rem;font-weight:900;color:#c0392b;flex-shrink:0;}',
     '.rt-overlay p{color:#aaa;font-size:0.82rem;text-align:center;margin:0;line-height:1.5;flex-shrink:0;}',
-    '.rt-overlay .rt-play-btn{background:#c0392b;color:#fff;border:none;border-radius:8px;padding:14px 32px;font-family:inherit;font-size:1rem;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:background 0.2s;flex-shrink:0;margin-top:auto;}',
+    '.rt-overlay .rt-play-btn{background:#c0392b;color:#fff;border:none;border-radius:8px;padding:14px 32px;font-family:inherit;font-size:1rem;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:background 0.2s;flex-shrink:0;margin-top:auto;touch-action:manipulation;}',
     '.rt-overlay .rt-play-btn:hover{background:#96211b;}',
 
     /* Legend pills */
@@ -109,36 +124,37 @@
     document.head.appendChild(s);
   }
 
-  // ── Game ───────────────────────────────────────────────────────────────────
+  // ── Game constructor ───────────────────────────────────────────────────────
   function Game(root, cfg) {
-    this.root       = root;
-    this.cfg        = cfg;
-    this.images     = [];
-    this.settings   = {};
-    this.score      = 0;
-    this.lives      = 3;
-    this.combo      = 0;
-    this.current    = null;
-    this.phase      = 'idle';
-    this.round      = 0;
-    this._lastIdx   = null;
-    this._timer     = null;
-    this._timerRaf  = null;
-    // FIX: flag to prevent double-fire from stage tap + button click
-    this._answering = false;
+    this.root          = root;
+    this.cfg           = cfg;
+    this.images        = [];
+    this.settings      = {};
+    this.score         = 0;
+    this.lives         = 3;
+    this.combo         = 0;
+    this.current       = null;
+    this.phase         = 'idle';
+    this.round         = 0;
+    this._lastIdx      = null;
+    this._timer        = null;
+    this._timerRaf     = null;
+    this._answering    = false;  // double-fire guard
+    this._touchStartY  = 0;      // scroll delta guard
+    this._startedAt    = 0;      // FIX v4.3: phantom-tap guard timestamp
   }
 
+  // ── Load ──────────────────────────────────────────────────────────────────
   Game.prototype.load = function (done) {
     var self = this;
     fetch(self.cfg.dataUrl)
       .then(function (r) { return r.json(); })
       .then(function (data) {
-        // FIX: guard against empty or malformed JSON
         if (!data || !Array.isArray(data.images) || data.images.length === 0) {
           self.root.innerHTML = [
             '<div style="color:#c0392b;padding:20px;font-family:Oswald,Arial,sans-serif;background:#1a1a2e;border-radius:12px;text-align:center;">',
             '<div style="font-size:1.4rem;font-weight:700;margin-bottom:8px;">⚠️ Game Data Missing</div>',
-            '<div style="font-size:0.9rem;color:#aaa;">reaction-tap.json loaded but contains no images.<br>Upload the populated JSON file to IONOS → assets/jj-arcade/data/</div>',
+            '<div style="font-size:0.9rem;color:#aaa;">reaction-tap.json loaded but contains no images.<br>Upload the populated JSON to IONOS → assets/jj-arcade/data/</div>',
             '</div>'
           ].join('');
           return;
@@ -158,6 +174,7 @@
       });
   };
 
+  // ── Render ────────────────────────────────────────────────────────────────
   Game.prototype.render = function () {
     injectCSS('rt-css');
     var self = this;
@@ -193,39 +210,70 @@
     self._overlay = self._buildStartOverlay();
     self._stage.appendChild(self._overlay);
 
-    // FIX: stage tap uses pointerdown instead of pointerup to avoid
-    // conflict with button clicks. Only fires if no button was tapped.
-    // We track _answering to prevent double-fire entirely.
-    self._stage.addEventListener('pointerdown', function (e) {
-      // Ignore taps that originated on the buttons (they bubble up)
-      if (e.target.tagName === 'BUTTON') return;
-      // Only respond to direct stage / image taps
-      if (e.target === self._stage || e.target === self._img) {
-        e.preventDefault();
-        self._answer('position');
+    // ── Stage touch listeners ─────────────────────────────────────────────
+    //
+    // MOBILE path — touchstart (passive) records Y for scroll detection.
+    //               touchend checks delta: > 10px = scroll, ignore.
+    //               _startedAt guard swallows phantom tap from START ROLLING lift.
+    //               NO click listener — Android synthetic click after button
+    //               pointerdown would bubble here and double-fire _answer().
+    //
+    // DESKTOP path — pointerdown with pointerType guard (skips touch events).
+    //                Same _startedAt guard applied.
+    // ─────────────────────────────────────────────────────────────────────
+
+    self._stage.addEventListener('touchstart', function (e) {
+      if (e.touches && e.touches.length > 0) {
+        self._touchStartY = e.touches[0].clientY;
       }
+    }, { passive: true });
+
+    self._stage.addEventListener('touchend', function (e) {
+      if (e.target.tagName === 'BUTTON') return;
+      if (e.target !== self._stage && e.target !== self._img) return;
+      var endY   = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : self._touchStartY;
+      var deltaY = Math.abs(endY - self._touchStartY);
+      if (deltaY > 10) return;
+      if (Date.now() - self._startedAt < 500) return; // phantom-tap guard
+      self._answer('position');
+    });
+
+    // Desktop mouse only — pointerType guard skips touch
+    self._stage.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'touch') return;
+      if (e.target.tagName === 'BUTTON') return;
+      if (e.target !== self._stage && e.target !== self._img) return;
+      if (Date.now() - self._startedAt < 500) return; // phantom-tap guard
+      self._answer('position');
     });
 
     wrap.appendChild(self._stage);
 
     // Instruction
     wrap.appendChild(el('div', { class: 'rt-instruction' },
-      '👇 TAP image = Position  •  ⚡ TAP TO SUBMIT = Submission'
+      '👇 TAP image or POSITION button  •  ⚡ TAP SUBMIT = Submission'
     ));
 
-    // Two buttons
+    // ── Two buttons ───────────────────────────────────────────────────────
+    // pointerdown + stopPropagation on both.
+    // stopPropagation stops the event reaching the stage listener.
+    // No click listeners anywhere — avoids Android synthetic click double-fire.
+    // _startedAt guard on each button too.
+    // ─────────────────────────────────────────────────────────────────────
+
     var btnRow = el('div', { class: 'rt-btn-row' });
 
-   self._imgBtn = el('button', { class: 'rt-img-btn' }, '👇 TAP POSITION');
+    self._imgBtn = el('button', { class: 'rt-img-btn' }, '👇 POSITION');
     self._imgBtn.addEventListener('pointerdown', function (e) {
       e.stopPropagation();
+      if (Date.now() - self._startedAt < 500) return;
       self._answer('position');
     });
-    self._imgBtn.style.display = 'none';
 
-    self._subBtn = el('button', { class: 'rt-sub-btn', style: { width: '100%' } }, '⚡ TAP TO SUBMIT');
+    self._subBtn = el('button', { class: 'rt-sub-btn' }, '⚡ TAP TO SUBMIT');
     self._subBtn.addEventListener('pointerdown', function (e) {
       e.stopPropagation();
+      if (Date.now() - self._startedAt < 500) return;
       self._answer('submission');
     });
 
@@ -242,12 +290,13 @@
     self.root.appendChild(wrap);
   };
 
+  // ── Overlays ──────────────────────────────────────────────────────────────
   Game.prototype._buildStartOverlay = function () {
     var self = this;
     var o = el('div', { class: 'rt-overlay' });
     o.appendChild(el('h2', {}, '⚡ Reaction Tap'));
-    o.appendChild(el('p', {}, '👇 Tap image = Position'));
-    o.appendChild(el('p', {}, '⚡ Right button = Submission'));
+    o.appendChild(el('p', {}, '👇 Tap image or POSITION button = Position'));
+    o.appendChild(el('p', {}, '⚡ TAP TO SUBMIT button = Submission'));
     o.appendChild(el('p', {}, '❤️ ' + (this.settings.lives || 3) + ' lives  •  Combo multipliers'));
     var btn = el('button', { class: 'rt-play-btn' }, 'START ROLLING');
     btn.addEventListener('pointerdown', function (e) {
@@ -267,26 +316,32 @@
     var btn = el('button', { class: 'rt-play-btn' }, 'GO AGAIN');
     btn.addEventListener('pointerdown', function (e) {
       e.stopPropagation();
+      self._startedAt = Date.now(); // reset phantom-tap guard for new game
       self._resetGame();
     });
     o.appendChild(btn);
     return o;
   };
 
+  // ── Game flow ─────────────────────────────────────────────────────────────
   Game.prototype._startGame = function () {
     this._overlay.remove();
-    this._answering = false;
+    this._answering   = false;
+    this._touchStartY = 0;
+    this._startedAt   = Date.now(); // FIX v4.3: start phantom-tap guard window
     this._nextRound();
   };
 
   Game.prototype._resetGame = function () {
-    this.score      = 0;
-    this.lives      = this.settings.lives || 3;
-    this.combo      = 0;
-    this.round      = 0;
-    this.phase      = 'idle';
-    this._lastIdx   = null;
-    this._answering = false;
+    this.score        = 0;
+    this.lives        = this.settings.lives || 3;
+    this.combo        = 0;
+    this.round        = 0;
+    this.phase        = 'idle';
+    this._lastIdx     = null;
+    this._answering   = false;
+    this._touchStartY = 0;
+    // _startedAt set in GO AGAIN handler before calling this
     this._stage.querySelectorAll('.rt-overlay').forEach(function (o) { o.remove(); });
     this._updateHUD();
     this._nextRound();
@@ -298,17 +353,16 @@
     cancelAnimationFrame(self._timerRaf);
 
     self.round++;
-    self.phase      = 'showing';
-    self._answering = false; // FIX: reset double-fire guard for new round
+    self.phase        = 'showing';
+    self._answering   = false;
+    self._touchStartY = 0;
 
-    // Pick image, avoid immediate repeat
     var pool = self.images.slice();
     if (self._lastIdx !== null && pool.length > 1) pool.splice(self._lastIdx, 1);
     var pick      = pool[Math.floor(Math.random() * pool.length)];
     self._lastIdx = self.images.indexOf(pick);
     self.current  = pick;
 
-    // Reset stage
     self._stage.className      = 'rt-stage';
     self._feedback.className   = 'rt-feedback';
     self._feedback.textContent = '';
@@ -329,15 +383,14 @@
     }, duration);
   };
 
-  // ── Core answer handler ────────────────────────────────────────────────────
-  // FIX: _answering flag prevents double-fire from simultaneous events
+  // ── Answer handler ────────────────────────────────────────────────────────
   Game.prototype._answer = function (buttonType) {
     if (this.phase !== 'showing') return;
-    if (this._answering) return;            // FIX: block double-fire
+    if (this._answering) return;
     if (this._stage.querySelector('.rt-overlay')) return;
-    if (!this.current) return;             // FIX: guard against missing data
+    if (!this.current) return;
 
-    this._answering = true;               // FIX: lock until next round
+    this._answering = true;
 
     clearTimeout(this._timer);
     cancelAnimationFrame(this._timerRaf);
@@ -348,7 +401,7 @@
     } else {
       var shouldHave = this.current.type === 'submission'
         ? 'That was a submission — use TAP TO SUBMIT!'
-        : 'That\'s a position — tap the image!';
+        : 'That\'s a position — tap image or POSITION!';
       this._wrong(shouldHave);
     }
   };
@@ -402,6 +455,7 @@
     }
   };
 
+  // ── Timer bar ─────────────────────────────────────────────────────────────
   Game.prototype._startTimerBar = function (duration) {
     var self  = this;
     var start = performance.now();
@@ -421,6 +475,7 @@
     self._timerRaf = requestAnimationFrame(tick);
   };
 
+  // ── HUD ───────────────────────────────────────────────────────────────────
   Game.prototype._updateHUD = function () {
     this._scoreEl.textContent = this.score + ' pts';
     var hearts = '';
