@@ -107,7 +107,10 @@
   function buildCategoryTabs() {
     var container = document.getElementById('hm-categories');
     if (!container || !allData) return;
-    container.innerHTML = Object.keys(allData).map(function (key) {
+    var VISIBLE_CATS = ['techniques', 'positions'];
+    container.innerHTML = Object.keys(allData).filter(function (key) {
+      return VISIBLE_CATS.indexOf(key) !== -1;
+    }).map(function (key) {
       var cat = allData[key];
       return '<button class="hm-cat-btn ' + (key === currentCategory ? 'hm-cat-active' : '') + '" data-cat="' + key + '">' + cat.label + '</button>';
     }).join('');
