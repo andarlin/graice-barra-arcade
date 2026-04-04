@@ -1,0 +1,53 @@
+{
+  "images": [
+    {
+      "file": "armbar.png",
+      "label": "Armbar",
+      "type": "submission",
+      "hint": "Armbar — TAP TO SUBMIT!"
+    },
+    {
+      "file": "triangle-choke.png",
+      "label": "Triangle Choke",
+      "type": "submission",
+      "hint": "Triangle Choke — TAP TO SUBMIT!"
+    },
+    {
+      "file": "kimura.png",
+      "label": "Kimura",
+      "type": "submission",
+      "hint": "Kimura — TAP TO SUBMIT!"
+    },
+    {
+      "file": "closed-guard.png",
+      "label": "Closed Guard",
+      "type": "position",
+      "hint": "Closed Guard — just tap the image!"
+    },
+    {
+      "file": "side-control-position.png",
+      "label": "Side Control",
+      "type": "position",
+      "hint": "Side Control — just tap the image!"
+    },
+    {
+      "file": "mount-position.png",
+      "label": "Mount",
+      "type": "position",
+      "hint": "Mount — just tap the image!"
+    },
+    {
+      "file": "back-control-position.png",
+      "label": "Back Control",
+      "type": "position",
+      "hint": "Back Control — just tap the image!"
+    }
+  ],
+  "settings": {
+    "displayTime": 2000,
+    "feedbackTime": 900,
+    "lives": 3,
+    "comboMultiplier": true,
+    "pointsPerCorrect": 100
+  }
+}

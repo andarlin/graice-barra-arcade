@@ -270,6 +270,20 @@
   }
   .mob-fire:active { background: rgba(245,166,35,0.4); }
 
+.mob-move-group {
+    display: flex;
+    gap: 12px;
+  }
+  .mob-move-group .mob-btn {
+    min-width: 72px;
+    font-size: 18px;
+    padding: 16px 20px;
+  }
+  .mob-fire {
+    min-width: 110px;
+    font-size: 14px;
+    padding: 16px 20px;
+  }
   @media (max-width: 600px) {
     #mobileControls { display: flex; }
   }
@@ -456,7 +470,7 @@
   </div>
 
   <!-- GAME CANVAS -->
-  <canvas id="gameCanvas" width="760" height="520"></canvas>
+  <canvas id="gameCanvas" width="760" height="620"></canvas>
 
   <!-- BELT BAR -->
   <div id="beltBar" style="display:none">
@@ -507,12 +521,14 @@
   </div>
 
   <!-- MOBILE CONTROLS -->
-  <div id="mobileControls">
-    <button class="mob-btn" id="btnLeft">◀</button>
-    <button class="mob-btn mob-fire" id="btnFire">FIRE</button>
-    <button class="mob-btn" id="btnRight">▶</button>
+<div id="mobileControls">
+    <div class="mob-move-group">
+      <button class="mob-btn" id="btnLeft">◀</button>
+      <button class="mob-btn" id="btnRight">▶</button>
+    </div>
+    <button class="mob-btn mob-fire" id="btnFire">⚡ FIRE</button>
   </div>
-</div>
+
 
 <script>
 // =========================================================
@@ -608,14 +624,14 @@ function initStars() {
 // --- RESIZE ---
 function resizeCanvas() {
   const maxW = Math.min(window.innerWidth, 800);
-  // On touch/mobile: reserve space for HUD (40px) + mobile controls (115px) + belt bar (36px) = 191px
-  // On desktop: just HUD (40px) + belt bar (36px) = 76px
+  // Reserve: HUD top (40px) + mobile controls bottom (110px) + small margin (10px) = 160px mobile
+  // Desktop: HUD (40px) + belt bar (36px) + margin (4px) = 80px
   const isMobile = window.innerWidth <= 600 || (window.matchMedia('(hover: none) and (pointer: coarse)').matches);
-  const reserved = isMobile ? 195 : 80;
+  const reserved = isMobile ? 160 : 80;
   const maxH = window.innerHeight - reserved;
-  const scale = Math.min(maxW / 760, maxH / 560);
+  const scale = Math.min(maxW / 760, maxH / 620);
   canvas.style.width = (760 * scale) + 'px';
-  canvas.style.height = (520 * scale) + 'px';
+  canvas.style.height = (620 * scale) + 'px';
 }
 
 // --- INIT GAME ---

@@ -93,10 +93,10 @@
         btn.dataset.kind = String(card.kind);
 
         // front uses global cardFront like memory.js does
-        const frontImg =
-          (window.JJ_ARCADE_CONFIG && window.JJ_ARCADE_CONFIG.cardFront)
-            ? window.JJ_ARCADE_CONFIG.cardFront
-            : "";
+       const frontImg =
+  gameConfig.cardFront ||
+  (window.JJ_ARCADE_CONFIG && window.JJ_ARCADE_CONFIG.cardFront) ||
+  "";
 
         // back text: name cards short + bold, desc cards slightly smaller
         const back =
