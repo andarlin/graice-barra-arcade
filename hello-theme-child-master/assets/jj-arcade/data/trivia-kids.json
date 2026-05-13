@@ -1,0 +1,208 @@
+{
+  "version": "1.0.0",
+  "mode": "kids",
+  "categories": ["gb-culture", "belt-system", "techniques", "positions", "history"],
+  "questions": [
+
+    { "id": "gb-k-01", "category": "gb-culture", "mode": "kids",
+      "question": "What is the Gracie Barra motto?",
+      "answers": ["Fight hard, win always!", "Jiu-Jitsu for Everyone!", "Be the strongest!", "Never give up!"],
+      "correct": 1, "explanation": "Gracie Barra's motto is 'Jiu-Jitsu for Everyone!' — it means BJJ is for all kids, families, and people everywhere." },
+
+    { "id": "gb-k-02", "category": "gb-culture", "mode": "kids",
+      "question": "What do GB students say when they greet their professor?",
+      "answers": ["Hello!", "Oss!", "Thank you!", "Let's go!"],
+      "correct": 1, "explanation": "'Oss!' is the special Gracie Barra greeting — it means 'I respect you and I'm ready to learn!'" },
+
+    { "id": "gb-k-03", "category": "gb-culture", "mode": "kids",
+      "question": "What colour is the Gracie Barra logo?",
+      "answers": ["Blue and yellow", "Red and white", "Black and green", "Purple and gold"],
+      "correct": 1, "explanation": "The GB logo is red and white — you'll see it on your gi patch and on the school walls!" },
+
+    { "id": "gb-k-04", "category": "gb-culture", "mode": "kids",
+      "question": "What do we call the uniform you wear in Jiu-Jitsu class?",
+      "answers": ["Shorts", "Gi", "Uniform top", "Kimono pants"],
+      "correct": 1, "explanation": "The 'Gi' (or 'Kimono') is the special jacket and pants you wear in BJJ — it has lots of grips for techniques!" },
+
+    { "id": "gb-k-05", "category": "gb-culture", "mode": "kids",
+      "question": "What is the mat area in a Jiu-Jitsu school called?",
+      "answers": ["Arena", "Tatami", "Dojo floor", "Training pit"],
+      "correct": 1, "explanation": "The mat area is called the 'Tatami' — it's the soft mat that keeps you safe when you train!" },
+
+    { "id": "gb-k-06", "category": "gb-culture", "mode": "kids",
+      "question": "Before you step on the mat, what should you always do?",
+      "answers": ["Run and jump on!", "Bow or say Oss as a sign of respect", "Put on your shoes", "Stretch alone in the corner"],
+      "correct": 1, "explanation": "Bowing or saying 'Oss' before stepping on the mat shows respect for the school and your training partners." },
+
+    { "id": "gb-k-07", "category": "gb-culture", "mode": "kids",
+      "question": "What is your teacher called at Gracie Barra?",
+      "answers": ["Coach", "Professor", "Sensei", "Master"],
+      "correct": 1, "explanation": "At GB, instructors are called 'Professor' — it's a sign of respect for all they have learned and teach." },
+
+    { "id": "gb-k-08", "category": "gb-culture", "mode": "kids",
+      "question": "Why is it important to keep your gi clean?",
+      "answers": ["To look cool", "Respect for yourself and your training partners — hygiene is part of the code", "Professor gives you extra stripe", "So it's lighter to wear"],
+      "correct": 1, "explanation": "A clean gi shows respect for your training partners and the school. It's part of the Gracie Barra code!" },
+
+    { "id": "belt-k-01", "category": "belt-system", "mode": "kids",
+      "question": "What is the very first belt every new student gets?",
+      "answers": ["Yellow", "Blue", "White", "Orange"],
+      "correct": 2, "explanation": "White belt is where everyone starts — even the best black belts in the world began as white belts!" },
+
+    { "id": "belt-k-02", "category": "belt-system", "mode": "kids",
+      "question": "In the kids program, what belt comes after white?",
+      "answers": ["Blue", "Orange", "Yellow / Grey", "Green"],
+      "correct": 2, "explanation": "Kids belts go through yellow and grey before reaching the higher colours — each one means you've learned new skills!" },
+
+    { "id": "belt-k-03", "category": "belt-system", "mode": "kids",
+      "question": "How do you earn a stripe on your belt?",
+      "answers": ["Winning a fight", "Training hard, learning techniques, and showing respect", "Buying it from the store", "Having the nicest gi"],
+      "correct": 1, "explanation": "Stripes come from working hard, attending class, learning new techniques, and being a good training partner!" },
+
+    { "id": "belt-k-04", "category": "belt-system", "mode": "kids",
+      "question": "How many stripes can you get before moving to the next belt?",
+      "answers": ["2", "3", "4", "5"],
+      "correct": 2, "explanation": "You can earn up to 4 stripes on each belt. After 4 stripes, you might be ready for the next belt colour!" },
+
+    { "id": "belt-k-05", "category": "belt-system", "mode": "kids",
+      "question": "What does it mean when someone has a black belt?",
+      "answers": ["They are brand new", "They have trained for many years and mastered the basics", "They won one competition", "They are the youngest in the school"],
+      "correct": 1, "explanation": "Black belt means many years of hard training, dedication, and mastery — it's a huge achievement!" },
+
+    { "id": "belt-k-06", "category": "belt-system", "mode": "kids",
+      "question": "Should you be upset if someone else gets their belt before you?",
+      "answers": ["Yes, it means you are bad", "No — everyone learns at their own pace. Focus on your own progress!", "Yes, ask the professor why", "Yes, train less until they catch up"],
+      "correct": 1, "explanation": "Everyone learns differently! Focus on your own journey — your time will come if you keep training!" },
+
+    { "id": "belt-k-07", "category": "belt-system", "mode": "kids",
+      "question": "What colour belt do you get in the kids program after green?",
+      "answers": ["Orange", "Purple", "Blue", "Red"],
+      "correct": 2, "explanation": "In the GB kids system, after green comes blue — which is also the first adult belt! Big milestone!" },
+
+    { "id": "belt-k-08", "category": "belt-system", "mode": "kids",
+      "question": "Why does your professor tie your belt at promotion?",
+      "answers": ["Because it's a special rule", "As a sign of respect and to officially welcome you to the new rank", "Because you can't tie it yourself", "So it stays tight during sparring"],
+      "correct": 1, "explanation": "When your professor ties your belt at promotion, it's a special moment of respect — they're welcoming you to your new rank!" },
+
+    { "id": "tech-k-01", "category": "techniques", "mode": "kids",
+      "question": "What do you do when you want the sparring to stop?",
+      "answers": ["Yell stop!", "Stand up quickly", "Tap your training partner 3 times", "Cover your head"],
+      "correct": 2, "explanation": "Tapping 3 times (or saying 'tap!') is the signal to stop — your partner MUST let go immediately. It keeps everyone safe!" },
+
+    { "id": "tech-k-02", "category": "techniques", "mode": "kids",
+      "question": "Why is it important to tap when you're in a tough spot?",
+      "answers": ["It means you lose forever", "It keeps you safe so you can train again tomorrow!", "It means you have to leave class", "Professor gets angry if you don't"],
+      "correct": 1, "explanation": "Tapping is smart, not weak! It means 'I'll try again' — staying safe means you can keep training!" },
+
+    { "id": "tech-k-03", "category": "techniques", "mode": "kids",
+      "question": "What is a 'sweep' in BJJ?",
+      "answers": ["Cleaning the mat with a broom", "Rolling your partner so they go to the bottom and you're on top", "Escaping a hold", "Running around the mat"],
+      "correct": 1, "explanation": "A sweep flips the positions — you go from being on bottom to being on top! It's like reversing the game." },
+
+    { "id": "tech-k-04", "category": "techniques", "mode": "kids",
+      "question": "What is a 'shrimp move' used for in BJJ?",
+      "answers": ["A swimming drill", "Moving your hips away to create space and escape", "A takedown technique", "A guard pass"],
+      "correct": 1, "explanation": "Shrimping (hip escape) helps you create space to get your legs free — like a little shrimp wiggling away!" },
+
+    { "id": "tech-k-05", "category": "techniques", "mode": "kids",
+      "question": "What does 'guard' mean in Jiu-Jitsu?",
+      "answers": ["A security guard at the door", "Using your legs to control or stop your opponent while on your back", "Running away", "Standing and blocking punches"],
+      "correct": 1, "explanation": "Guard is when you use your legs to control your opponent from your back — your legs are your tools!" },
+
+    { "id": "tech-k-06", "category": "techniques", "mode": "kids",
+      "question": "What is a 'takedown'?",
+      "answers": ["Sitting down for a break", "Taking your partner from standing to the ground", "A type of submission", "Pulling down on the gi collar"],
+      "correct": 1, "explanation": "A takedown moves the fight from standing to the ground — where BJJ really shines!" },
+
+    { "id": "tech-k-07", "category": "techniques", "mode": "kids",
+      "question": "Why is Jiu-Jitsu called the 'Gentle Art'?",
+      "answers": ["Because it's slow and boring", "Because it uses leverage and technique, not just strength", "Because there's no contact", "Because you wear soft gi fabric"],
+      "correct": 1, "explanation": "BJJ is called the Gentle Art because a smaller person can use technique and leverage to overcome a bigger, stronger opponent!" },
+
+    { "id": "tech-k-08", "category": "techniques", "mode": "kids",
+      "question": "What technique is like a tight hug around someone's waist from behind?",
+      "answers": ["Armbar", "Triangle", "Body lock / Back clinch", "Guard pull"],
+      "correct": 2, "explanation": "A body lock or back clinch wraps your arms around your opponent's waist from behind — great control!" },
+
+    { "id": "pos-k-01", "category": "positions", "mode": "kids",
+      "question": "What is the 'Mount' position?",
+      "answers": ["Sitting on a horse", "Sitting on top of your partner's chest/stomach", "Standing over someone", "Lying next to someone"],
+      "correct": 1, "explanation": "Mount means you're sitting on top of your partner — it's one of the strongest positions in BJJ!" },
+
+    { "id": "pos-k-02", "category": "positions", "mode": "kids",
+      "question": "When someone is in your 'Closed Guard', where are your legs?",
+      "answers": ["Flat on the mat", "Crossed and locked around your partner's waist", "On your partner's shoulders", "Kicking in the air"],
+      "correct": 1, "explanation": "Closed guard = your legs locked around your partner's waist. You're on your back but still in control!" },
+
+    { "id": "pos-k-03", "category": "positions", "mode": "kids",
+      "question": "What is 'Side Control'?",
+      "answers": ["Controlling the TV remote", "Lying sideways across your partner's body while on top", "A guard position", "Sitting behind someone"],
+      "correct": 1, "explanation": "Side Control means you're lying across your partner from the side — you're on top but sideways! It's very strong." },
+
+    { "id": "pos-k-04", "category": "positions", "mode": "kids",
+      "question": "If you're on your partner's back with your legs hooked in, what position is that?",
+      "answers": ["Mount", "Closed Guard", "Back Control", "Side Control"],
+      "correct": 2, "explanation": "Back Control means you're behind your partner with your legs hooked in — like a human backpack! Very strong position." },
+
+    { "id": "pos-k-05", "category": "positions", "mode": "kids",
+      "question": "What does it mean to 'pass the guard'?",
+      "answers": ["Handing something to your partner", "Getting past your partner's legs to a better position on top", "Escaping from a choke", "Jumping over someone"],
+      "correct": 1, "explanation": "Passing the guard means getting through your partner's legs so you can get on top in a better position!" },
+
+    { "id": "pos-k-06", "category": "positions", "mode": "kids",
+      "question": "What position are you in when you're on your back with your partner kneeling between your legs?",
+      "answers": ["Mount", "Guard (your partner is in your guard!)", "Back Control", "Side Control"],
+      "correct": 1, "explanation": "When your partner is kneeling between your legs and you're on your back, they're inside your Guard — you can attack from here!" },
+
+    { "id": "pos-k-07", "category": "positions", "mode": "kids",
+      "question": "Why do you want to be on top in BJJ?",
+      "answers": ["It looks cooler", "Top positions give you more control and options to attack", "It makes you heavier", "So you can see better"],
+      "correct": 1, "explanation": "Being on top gives you control and gravity on your side — it's harder for your partner to attack you from the bottom!" },
+
+    { "id": "pos-k-08", "category": "positions", "mode": "kids",
+      "question": "What is the 'Turtle' position?",
+      "answers": ["Moving really slowly", "Curling up on all fours to protect yourself like a turtle shell", "A submission hold", "Swimming on the mat"],
+      "correct": 1, "explanation": "Turtling means you curl up on hands and knees to protect your neck — just like a turtle hiding in its shell!" },
+
+    { "id": "hist-k-01", "category": "history", "mode": "kids",
+      "question": "Jiu-Jitsu originally came from which country?",
+      "answers": ["China", "Japan", "Brazil", "USA"],
+      "correct": 1, "explanation": "Jiu-Jitsu started in Japan a long, long time ago — then it travelled to Brazil where the Gracie family made it famous!" },
+
+    { "id": "hist-k-02", "category": "history", "mode": "kids",
+      "question": "Who is the founder of Gracie Barra?",
+      "answers": ["Royce Gracie", "Helio Gracie", "Carlos Gracie Jr.", "Bruce Lee"],
+      "correct": 2, "explanation": "Carlos Gracie Jr. founded Gracie Barra in 1986 in Brazil — and now there are GB schools all over the world including right here!" },
+
+    { "id": "hist-k-03", "category": "history", "mode": "kids",
+      "question": "What country did the Gracie family bring Jiu-Jitsu to from Japan?",
+      "answers": ["USA", "Canada", "Brazil", "Portugal"],
+      "correct": 2, "explanation": "A Japanese Judo master named Maeda taught the Gracie family in Brazil — and they turned it into Brazilian Jiu-Jitsu!" },
+
+    { "id": "hist-k-04", "category": "history", "mode": "kids",
+      "question": "What does 'BJJ' stand for?",
+      "answers": ["Big Jump Judo", "Brazilian Jiu-Jitsu", "Best Junior Jiu-Jitsu", "Blue-belt Junior Judo"],
+      "correct": 1, "explanation": "BJJ = Brazilian Jiu-Jitsu — the art you practice every time you step on the mat at GB Lake Country!" },
+
+    { "id": "hist-k-05", "category": "history", "mode": "kids",
+      "question": "Gracie Barra schools can be found in how many countries?",
+      "answers": ["Only Brazil and Canada", "Only 10 countries", "Over 50 countries worldwide", "Only 3 countries"],
+      "correct": 2, "explanation": "Gracie Barra has schools in over 50 countries! When you wear your GB gi, you're connected to students all around the world." },
+
+    { "id": "hist-k-06", "category": "history", "mode": "kids",
+      "question": "Why is Jiu-Jitsu called 'the great equalizer'?",
+      "answers": ["Because everyone wears the same gi", "Because a smaller person can use technique to beat a bigger, stronger person", "Because everyone gets the same belt", "Because all classes are the same length"],
+      "correct": 1, "explanation": "Jiu-Jitsu is the great equalizer because smart technique beats size and strength — that's why everyone can do it!" },
+
+    { "id": "hist-k-07", "category": "history", "mode": "kids",
+      "question": "Gracie Barra Lake Country is in which province of Canada?",
+      "answers": ["Ontario", "Alberta", "British Columbia", "Quebec"],
+      "correct": 2, "explanation": "GB Lake Country is in beautiful British Columbia — right in the Okanagan Valley!" },
+
+    { "id": "hist-k-08", "category": "history", "mode": "kids",
+      "question": "What is the main thing you learn in Jiu-Jitsu besides techniques?",
+      "answers": ["How to win every fight", "Respect, discipline, confidence, and never giving up", "How to be the loudest in class", "How to wear the gi fastest"],
+      "correct": 1, "explanation": "BJJ teaches much more than moves — respect, discipline, confidence and perseverance are the real gifts of the gentle art!" }
+
+  ]
+}

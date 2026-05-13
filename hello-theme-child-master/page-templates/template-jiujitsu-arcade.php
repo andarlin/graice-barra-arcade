@@ -2,12 +2,12 @@
 /**
  * Template Name: Jiu-Jitsu Arcade
  * @package hello-theme-child-master
- * Version: 2.8.0 — Netflix-style layout | cinematic hero + carousel
+ * Version: 2.9.0 — Netflix-style layout | cinematic hero + carousel
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 $child_uri = get_stylesheet_directory_uri();
-$ver       = '2.8.0';
+$ver       = '2.9.0';
 
 /*
  * THUMBNAIL MAP
@@ -21,6 +21,7 @@ $thumbs = [
     'space-invaders'  => $child_uri . '/assets/jj-arcade/thumbnails/space_invaders_thumbnail.webp',
     'reaction-tap'    => $child_uri . '/assets/jj-arcade/thumbnails/reaction_tap_thumbnail.webp',
     'dojo-dash'       => $child_uri . '/assets/jj-arcade/thumbnails/dojo_dash_thumbnail.webp',
+    'trivia'          => $child_uri . '/assets/jj-arcade/thumbnails/trivia_thumbnail.webp',
 ];
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -30,7 +31,7 @@ $thumbs = [
     <?php wp_head(); ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@300;400;500;600&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo $child_uri; ?>/assets/jj-arcade/jj-arcade.css?ver=<?php echo $ver; ?>">
     <link rel="stylesheet" href="<?php echo $child_uri; ?>/assets/jj-arcade/jj-memory-game.css?ver=<?php echo $ver; ?>">
     <link rel="stylesheet" href="<?php echo $child_uri; ?>/assets/jj-arcade/hangman.css?ver=<?php echo $ver; ?>">
@@ -416,7 +417,7 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
 
     <!-- STATS BAR -->
     <div class="jja-stats">
-        <div class="jja-stat"><div class="jja-stat__num">7</div><div class="jja-stat__lbl">Games</div></div>
+        <div class="jja-stat__num">8</div><div class="jja-stat__lbl">Games</div>
         <div class="jja-stat"><div class="jja-stat__num">5</div><div class="jja-stat__lbl">Levels</div></div>
         <div class="jja-stat"><div class="jja-stat__num">4.5★</div><div class="jja-stat__lbl">Rating</div></div>
         <div class="jja-stat"><div class="jja-stat__num">Free</div><div class="jja-stat__lbl">To Play</div></div>
@@ -426,7 +427,7 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
     <div class="jja-carousel-section">
         <div class="jja-carousel-header">
             <span class="jja-carousel-title">All Games</span>
-            <span class="jja-carousel-count">7 Available</span>
+            <span class="jja-carousel-count">8 Available</span>
         </div>
 
         <!-- id="jj-arcade-nav" + class/data-game preserved for router -->
@@ -494,6 +495,16 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
                     <span class="jja-card-tag">Action</span>
                 </div>
             </button>
+            <button class="jj-arcade__nav-btn" data-game="trivia">
+                <img class="jja-card-thumb" src="<?php echo esc_url($thumbs['trivia']); ?>" alt="GB Trivia Quiz" loading="lazy"
+                     onerror="this.style.background='#12395d';this.removeAttribute('onerror');">
+                <div class="jja-card-body">
+                    <span class="jja-card-name">GB Trivia Quiz</span>
+                    <span class="jja-card-desc">Coach Trenell quizzes you on GB culture, belts, and BJJ.</span>
+                    <span class="jja-card-tag">Trivia</span>
+                </div>
+            </button>
+
 
         </nav>
     </div>
@@ -502,12 +513,7 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
     <div class="jja-locked-section">
         <div class="jja-locked-header">Coming Soon</div>
         <div class="jja-locked-list">
-
-            <button class="jj-arcade__nav-btn--locked" data-teaser="trivia">
-                <div class="locked-left"><span class="lock-icon">&#128274;</span><span class="locked-name">BJJ Trivia</span></div>
-                <span class="locked-pill">In Development</span>
-            </button>
-
+          
             <button class="jj-arcade__nav-btn--locked" data-teaser="position-builder">
                 <div class="locked-left"><span class="lock-icon">&#128274;</span><span class="locked-name">Position Builder</span></div>
                 <span class="locked-pill">In Development</span>
@@ -536,6 +542,7 @@ wp_footer();
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/hangman.js?ver=<?php echo $ver; ?>"></script>
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/belt-order.js?ver=<?php echo $ver; ?>"></script>
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/reaction-tap.js?ver=<?php echo $ver; ?>"></script>
+<script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/bjj-trivia.js?ver=<?php echo $ver; ?>"></script>
 
 <script data-noptimize="1">
 var CHILD_URI = '<?php echo $child_uri; ?>';
@@ -548,7 +555,8 @@ var JJA_GAME_META = {
     'belt-order':      { name:'Belt Order',      tag:'Ranking',   desc:'Drag the belts into the correct rank order.',                thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/belt_order_thumbnail.webp' },
     'space-invaders':  { name:'Space Invaders',  tag:'Arcade',    desc:'Defend the mat — shoot down the invaders!',                  thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/space_invaders_thumbnail.webp' },
     'reaction-tap':    { name:'Reaction Tap',    tag:'Reflex',    desc:'Tap the right student photo before time runs out.',          thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/reaction_tap_thumbnail.webp' },
-    'dojo-dash':       { name:'Dojo Dash',       tag:'Action',    desc:'Run through the dojo, collect GB badges, avoid rivals.',    thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/dojo_dash_thumbnail.webp' }
+    'dojo-dash':       { name:'Dojo Dash',       tag:'Action',    desc:'Run through the dojo, collect GB badges, avoid rivals.',    thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/dojo_dash_thumbnail.webp' },
+    'trivia':          { name:'GB Trivia Quiz',  tag:'Trivia',    desc:'Coach Trenell quizzes you on GB culture, belts, and BJJ.', thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/trivia_thumbnail.webp' }
 };
 
 /* Arcade config — zero changes from v2.6.0 */
@@ -583,16 +591,15 @@ window.JJ_ARCADE_CONFIG = {
         {id:'belt-order',type:'belt-order',title:'Belt Order'},
         {id:'space-invaders',type:'iframe',title:'Space Invaders',src:CHILD_URI+'/assets/jj-arcade/games/space-invaders-jj.html'},
         {id:'reaction-tap',type:'reaction-tap',title:'Reaction Tap',dataUrl:CHILD_URI+'/assets/jj-arcade/data/reaction-tap.json',assetBase:CHILD_URI+'/assets/jj-arcade/cards'},
-        {id:'dojo-dash',type:'iframe',title:'Dojo Dash',src:CHILD_URI+'/assets/jj-arcade/games/dojo-dash.html',hint:'Arrow keys or WASD to move &nbsp;|&nbsp; Collect GB badges &nbsp;|&nbsp; Avoid rivals &nbsp;|&nbsp; P to pause'}
+        {id:'dojo-dash',type:'iframe',title:'Dojo Dash',src:CHILD_URI+'/assets/jj-arcade/games/dojo-dash.html',hint:'Arrow keys or WASD to move &nbsp;|&nbsp; Collect GB badges &nbsp;|&nbsp; Avoid rivals &nbsp;|&nbsp; P to pause'},
+        {id:'trivia',type:'trivia',title:'GB Trivia Quiz'}
     ]
 };
 
 var JJ_TEASERS = {
-    'trivia':           {icon:'&#129504;',title:'BJJ Trivia Quiz',    desc:'Test your knowledge of techniques, rules, belt ranks, and Gracie Barra history.'},
     'position-builder': {icon:'&#128506;&#65039;',title:'Position Builder',desc:'Arrange techniques in sequence and build your attack chain.'},
     'scenario':         {icon:'&#127919;',title:'Scenario Engine',    desc:'Your opponent moves — what do you do? Make split-second decisions and see where your choices lead.'}
 };
-
 /* ── HERO CONTROLLER (v2.8) ── */
 (function(){
     var hero      = document.getElementById('jja-hero');
@@ -657,6 +664,7 @@ var JJ_TEASERS = {
         if(slug.indexOf('hangman')!==-1) return w.hangman||w.JJHangman||null;
         if(slug.indexOf('belt')!==-1)    return w.beltOrder||w['belt-order']||w.beltorder||null;
         if(slug.indexOf('memory')!==-1)  return w.memory||w.memoryGame||w['memory-game']||null;
+        if(slug.indexOf('trivia')!==-1)  return w.trivia||w['trivia']||null;
         return null;
     }
 

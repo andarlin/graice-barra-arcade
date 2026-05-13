@@ -1,0 +1,208 @@
+{
+  "version": "1.0.0",
+  "mode": "adult",
+  "categories": ["gb-culture", "belt-system", "techniques", "positions", "history"],
+  "questions": [
+
+    { "id": "gb-a-01", "category": "gb-culture", "mode": "adult",
+      "question": "What is the official Gracie Barra motto?",
+      "answers": ["Train Hard, Win Harder", "Jiu-Jitsu for Everyone", "Discipline and Respect", "Submit or Be Submitted"],
+      "correct": 1, "explanation": "Gracie Barra's motto is 'Jiu-Jitsu for Everyone' — reflecting their mission to make BJJ accessible to all ages and backgrounds." },
+
+    { "id": "gb-a-02", "category": "gb-culture", "mode": "adult",
+      "question": "Who founded Gracie Barra?",
+      "answers": ["Royce Gracie", "Rickson Gracie", "Carlos Gracie Jr.", "Helio Gracie"],
+      "correct": 2, "explanation": "Carlos Gracie Jr. founded Gracie Barra in Rio de Janeiro in 1986." },
+
+    { "id": "gb-a-03", "category": "gb-culture", "mode": "adult",
+      "question": "What does 'Oss' mean in a GB training context?",
+      "answers": ["I disagree", "I am ready / I understand / I respect you", "Let's spar", "Stop training"],
+      "correct": 1, "explanation": "'Oss' is a versatile term of respect and acknowledgment used throughout Gracie Barra classes." },
+
+    { "id": "gb-a-04", "category": "gb-culture", "mode": "adult",
+      "question": "What colours make up the Gracie Barra gi?",
+      "answers": ["Black and Gold", "Navy and White", "Red/Black and White", "Blue and Red"],
+      "correct": 2, "explanation": "The GB uniform is primarily red and black (logo) on white or black gi, maintaining consistent branding across all schools." },
+
+    { "id": "gb-a-05", "category": "gb-culture", "mode": "adult",
+      "question": "What is the GB Lake Country school location?",
+      "answers": ["Vernon, BC", "Kelowna, BC", "Lake Country, BC", "Penticton, BC"],
+      "correct": 2, "explanation": "Gracie Barra Lake Country is located in Lake Country, British Columbia, Canada." },
+
+    { "id": "gb-a-06", "category": "gb-culture", "mode": "adult",
+      "question": "What does the Gracie Barra patch on your gi represent?",
+      "answers": ["Your instructor's lineage", "Membership in the GB global network", "Competition ranking", "School seniority"],
+      "correct": 1, "explanation": "The GB patch connects you to a global network of over 900 schools under the Gracie Barra banner." },
+
+    { "id": "gb-a-07", "category": "gb-culture", "mode": "adult",
+      "question": "Which Gracie family member is credited with developing the self-defense emphasis of BJJ?",
+      "answers": ["Carlos Gracie Jr.", "Royce Gracie", "Helio Gracie", "Renzo Gracie"],
+      "correct": 2, "explanation": "Helio Gracie adapted Judo techniques to focus on leverage and ground fighting, creating what we now call BJJ." },
+
+    { "id": "gb-a-08", "category": "gb-culture", "mode": "adult",
+      "question": "How many Gracie Barra schools are there globally (approx.)?",
+      "answers": ["Over 200", "Over 500", "Over 900", "Over 1500"],
+      "correct": 2, "explanation": "Gracie Barra has over 900 affiliated schools worldwide, making it one of the largest BJJ organizations in the world." },
+
+    { "id": "belt-a-01", "category": "belt-system", "mode": "adult",
+      "question": "What is the correct adult belt order at Gracie Barra?",
+      "answers": ["White → Blue → Green → Purple → Brown → Black", "White → Yellow → Blue → Purple → Brown → Black", "White → Blue → Purple → Brown → Black", "White → Orange → Blue → Purple → Brown → Black"],
+      "correct": 2, "explanation": "Adult BJJ at GB follows: White → Blue → Purple → Brown → Black. Kids have a separate progression with colour belts." },
+
+    { "id": "belt-a-02", "category": "belt-system", "mode": "adult",
+      "question": "How many stripes can you earn on a belt before promotion?",
+      "answers": ["2", "3", "4", "5"],
+      "correct": 2, "explanation": "Students earn up to 4 stripes on each belt. After 4 stripes, the next promotion is to the following belt colour." },
+
+    { "id": "belt-a-03", "category": "belt-system", "mode": "adult",
+      "question": "What is the minimum age to receive a Black Belt in BJJ?",
+      "answers": ["16", "18", "19", "21"],
+      "correct": 2, "explanation": "IBJJF rules require a minimum age of 19 to be awarded an adult Black Belt." },
+
+    { "id": "belt-a-04", "category": "belt-system", "mode": "adult",
+      "question": "What colour belt does a Judo Black Belt typically receive when starting GB BJJ?",
+      "answers": ["White", "Blue", "Purple", "Brown"],
+      "correct": 1, "explanation": "A Judo Black Belt or practitioner from a related grappling art typically starts at Blue Belt in BJJ." },
+
+    { "id": "belt-a-05", "category": "belt-system", "mode": "adult",
+      "question": "Which GB belt is awarded after approximately 1.5–2 years of consistent training?",
+      "answers": ["White with 4 stripes", "Blue Belt", "Purple Belt", "Brown Belt"],
+      "correct": 1, "explanation": "Blue Belt typically comes after 1.5–2 years, though this varies by student. It's the first major milestone." },
+
+    { "id": "belt-a-06", "category": "belt-system", "mode": "adult",
+      "question": "A coral belt in BJJ represents which combination?",
+      "answers": ["Red and White", "Red and Black", "Both Red/White and Red/Black exist at different degrees", "There is no coral belt"],
+      "correct": 2, "explanation": "Both red-and-black (7th degree) and red-and-white (8th degree) coral belts exist above Black Belt in the BJJ system." },
+
+    { "id": "belt-a-07", "category": "belt-system", "mode": "adult",
+      "question": "What is the significance of a red belt in BJJ?",
+      "answers": ["Beginner level", "Competition champion", "9th or 10th degree — reserved for founding masters", "Head instructor rank"],
+      "correct": 2, "explanation": "The red belt is reserved for 9th and 10th degree Grand Masters — the highest honour in BJJ." },
+
+    { "id": "belt-a-08", "category": "belt-system", "mode": "adult",
+      "question": "In the GB kids belt system, which belt typically follows orange?",
+      "answers": ["Blue", "Green", "Yellow", "Purple"],
+      "correct": 1, "explanation": "Kids belts at GB generally follow: White → Yellow → Orange → Green → Blue (transitioning to adult blue)." },
+
+    { "id": "tech-a-01", "category": "techniques", "mode": "adult",
+      "question": "Which submission targets the elbow joint by hyperextending it?",
+      "answers": ["Triangle Choke", "Armbar", "Kimura", "Rear Naked Choke"],
+      "correct": 1, "explanation": "The Armbar (Juji-Gatame) hyperextends the elbow joint by applying leverage across it with your hips and legs." },
+
+    { "id": "tech-a-02", "category": "techniques", "mode": "adult",
+      "question": "The Kimura lock primarily attacks which joint?",
+      "answers": ["Elbow", "Knee", "Shoulder", "Wrist"],
+      "correct": 2, "explanation": "The Kimura is a double-wrist lock that applies rotational pressure on the shoulder joint." },
+
+    { "id": "tech-a-03", "category": "techniques", "mode": "adult",
+      "question": "What technique is performed by wrapping your legs around the opponent's head and one arm, then squeezing?",
+      "answers": ["Rear Naked Choke", "Guillotine", "Triangle Choke", "D'Arce Choke"],
+      "correct": 2, "explanation": "The Triangle Choke uses your legs to trap the opponent's head and one arm, compressing the carotid arteries." },
+
+    { "id": "tech-a-04", "category": "techniques", "mode": "adult",
+      "question": "A guard pass requires you to do what?",
+      "answers": ["Sweep your opponent", "Escape a submission", "Get past your opponent's legs to achieve a dominant position", "Submit from closed guard"],
+      "correct": 2, "explanation": "A guard pass moves you from inside your opponent's guard to a dominant position like side control, knee-on-belly, or mount." },
+
+    { "id": "tech-a-05", "category": "techniques", "mode": "adult",
+      "question": "What is a 'sweep' in BJJ?",
+      "answers": ["Defending a choke", "Reversing position so you go from bottom to top", "Escaping the back take", "Tapping out of a submission"],
+      "correct": 1, "explanation": "A sweep reverses position from guard (bottom) to top position. It scores 2 points in competition." },
+
+    { "id": "tech-a-06", "category": "techniques", "mode": "adult",
+      "question": "The Rear Naked Choke is typically applied from which position?",
+      "answers": ["Mount", "Side Control", "Guard", "Back Control"],
+      "correct": 3, "explanation": "The RNC is the primary submission from Back Control — you have both hooks in and your arm wrapped under the chin." },
+
+    { "id": "tech-a-07", "category": "techniques", "mode": "adult",
+      "question": "What does 'shrimping' (hip escape) help you do?",
+      "answers": ["Improve your guard passing", "Create space to recover guard from bottom positions", "Set up a triangle choke", "Improve takedowns"],
+      "correct": 1, "explanation": "The hip escape (shrimp) creates space between you and your opponent to recover guard or escape bad positions." },
+
+    { "id": "tech-a-08", "category": "techniques", "mode": "adult",
+      "question": "A Berimbolo is primarily associated with which guard style?",
+      "answers": ["Closed Guard", "Half Guard", "De La Riva Guard", "Spider Guard"],
+      "correct": 2, "explanation": "The Berimbolo originated from De La Riva guard and involves a rolling inversion to take the back." },
+
+    { "id": "pos-a-01", "category": "positions", "mode": "adult",
+      "question": "Which position scores 4 points in IBJJF competition?",
+      "answers": ["Guard", "Side Control", "Mount", "Knee on Belly"],
+      "correct": 2, "explanation": "Mount scores 4 points in IBJJF competition. Side Control scores 3, and Back Control with hooks scores 4." },
+
+    { "id": "pos-a-02", "category": "positions", "mode": "adult",
+      "question": "In Closed Guard, what is your primary control?",
+      "answers": ["Both hands gripping the collar", "Legs locked around opponent's waist", "One arm underhook", "Collar and sleeve grips"],
+      "correct": 1, "explanation": "Closed Guard is defined by your legs being locked (closed) around your opponent's waist/lower back." },
+
+    { "id": "pos-a-03", "category": "positions", "mode": "adult",
+      "question": "What is 'Back Control' in BJJ?",
+      "answers": ["Sitting on your opponent's back", "Being behind your opponent with hooks in and seatbelt grip", "Sprawling on opponent's back", "Turtle position"],
+      "correct": 1, "explanation": "Back Control means you're behind your opponent with both hooks (feet/heels) inside their thighs and a seatbelt grip around their torso." },
+
+    { "id": "pos-a-04", "category": "positions", "mode": "adult",
+      "question": "Half Guard means you have trapped how many of your opponent's legs?",
+      "answers": ["None", "Both legs", "One leg", "Their ankle only"],
+      "correct": 2, "explanation": "Half Guard means you've trapped one of your opponent's legs between both of yours — halfway between closed guard and being passed." },
+
+    { "id": "pos-a-05", "category": "positions", "mode": "adult",
+      "question": "North-South position is best described as:",
+      "answers": ["Both players standing", "Top player facing same direction as bottom player", "Top player facing opposite direction — head to hips", "Both players in guard"],
+      "correct": 2, "explanation": "North-South (or 100-kilos) has the top player facing the bottom player's feet, head to hips, creating a 180° orientation." },
+
+    { "id": "pos-a-06", "category": "positions", "mode": "adult",
+      "question": "Knee-on-Belly scores how many points in IBJJF competition?",
+      "answers": ["1", "2", "3", "4"],
+      "correct": 1, "explanation": "Knee-on-Belly scores 2 points in IBJJF and is a powerful control position before advancing to mount." },
+
+    { "id": "pos-a-07", "category": "positions", "mode": "adult",
+      "question": "What does it mean when someone 'turtles up'?",
+      "answers": ["They submit", "They curl into a defensive ball on all fours to protect their neck", "They shoot for a takedown", "They play open guard"],
+      "correct": 1, "explanation": "Turtling is a defensive posture — on all fours, elbows tight, protecting the neck from choke attempts." },
+
+    { "id": "pos-a-08", "category": "positions", "mode": "adult",
+      "question": "Which guard has you gripping your opponent's sleeve and collar while using your feet on their hips and biceps?",
+      "answers": ["De La Riva", "X-Guard", "Spider Guard", "Butterfly Guard"],
+      "correct": 2, "explanation": "Spider Guard uses sleeve + collar grips with feet on the biceps and hips for strong push-pull control." },
+
+    { "id": "hist-a-01", "category": "history", "mode": "adult",
+      "question": "In which year was Gracie Barra founded?",
+      "answers": ["1972", "1980", "1986", "1993"],
+      "correct": 2, "explanation": "Gracie Barra was founded by Carlos Gracie Jr. in 1986 in Barra da Tijuca, Rio de Janeiro." },
+
+    { "id": "hist-a-02", "category": "history", "mode": "adult",
+      "question": "Which Gracie family member made BJJ famous globally through early UFC competition?",
+      "answers": ["Carlos Gracie Jr.", "Helio Gracie", "Royce Gracie", "Rickson Gracie"],
+      "correct": 2, "explanation": "Royce Gracie won UFC 1, 2, and 4 using BJJ — introducing the art to a global audience in 1993-1994." },
+
+    { "id": "hist-a-03", "category": "history", "mode": "adult",
+      "question": "Brazilian Jiu-Jitsu evolved primarily from which martial art brought to Brazil?",
+      "answers": ["Karate", "Judo (Kodokan Jiu-Jitsu)", "Kung Fu", "Greco-Roman Wrestling"],
+      "correct": 1, "explanation": "Mitsuyo Maeda, a Kodokan Judo master, brought Judo/Jiu-Jitsu to Brazil and taught it to Carlos Gracie Sr." },
+
+    { "id": "hist-a-04", "category": "history", "mode": "adult",
+      "question": "What does 'Jiu-Jitsu' roughly translate to in English?",
+      "answers": ["Strong Way", "Gentle Art", "Fighting System", "Ground Battle"],
+      "correct": 1, "explanation": "'Jiu-Jitsu' means 'Gentle Art' — a reference to using an opponent's energy and leverage rather than brute force." },
+
+    { "id": "hist-a-05", "category": "history", "mode": "adult",
+      "question": "Gracie Barra expanded globally beginning primarily in which decade?",
+      "answers": ["1970s", "1980s", "1990s", "2000s"],
+      "correct": 2, "explanation": "After Royce Gracie's UFC success in the early 1990s, BJJ demand exploded and GB began its international expansion." },
+
+    { "id": "hist-a-06", "category": "history", "mode": "adult",
+      "question": "The 'Gracie Challenge' was famous for testing BJJ against which types of opponents?",
+      "answers": ["Other BJJ schools only", "Boxers, wrestlers, and practitioners of other martial arts", "UFC competitors exclusively", "Street fighters"],
+      "correct": 1, "explanation": "The Gracie Challenge invited fighters from all styles to test their art against BJJ — proving its effectiveness across disciplines." },
+
+    { "id": "hist-a-07", "category": "history", "mode": "adult",
+      "question": "Which Gracie Barra athlete is known as one of the most decorated competitors in modern BJJ history?",
+      "answers": ["Romulo Barral", "Marcus 'Buchecha' Almeida", "Roger Gracie", "All are multiple-time world champions"],
+      "correct": 3, "explanation": "Roger Gracie, Romulo Barral, and Marcus Buchecha are all multiple-time IBJJF world champions representing the GB lineage." },
+
+    { "id": "hist-a-08", "category": "history", "mode": "adult",
+      "question": "Gracie Barra Lake Country serves which community?",
+      "answers": ["Kelowna City Centre", "Vernon Hills", "Lake Country, Turtle Bay Crossing area", "West Kelowna"],
+      "correct": 2, "explanation": "GB Lake Country is based at Turtle Bay Crossing, 723-11850 Oceola Rd, Lake Country BC — serving the local community and families." }
+
+  ]
+}
