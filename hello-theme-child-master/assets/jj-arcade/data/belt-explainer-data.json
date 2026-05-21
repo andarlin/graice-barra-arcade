@@ -1,0 +1,149 @@
+{
+  "kids": [
+    {
+      "id": "white",
+      "label": "White Belt",
+      "color": "#e5e7eb",
+      "textColor": "#1f2937",
+      "stripe": "#9ca3af",
+      "quote": "This is where every single champion starts. There is nothing to prove yet — just show up, stay safe, and let the mat teach you. You belong here.",
+      "time": "Day one",
+      "timeDetail": "Everyone starts here. No experience needed.",
+      "focus": "Safe falling, listening skills, shrimping, basic movements",
+      "milestone": "Showing up consistently and being coachable — that is the first test.",
+      "parentNote": "White belt is about building confidence and love for the mat. No pressure, just fun."
+    },
+    {
+      "id": "grey",
+      "label": "Grey Belt",
+      "color": "#9ca3af",
+      "textColor": "#ffffff",
+      "stripe": "#6b7280",
+      "quote": "You have proven you can show up. Grey belt means you are coachable — and that is already more than most kids who start ever manage. Keep coming back.",
+      "time": "3–6 months",
+      "timeDetail": "Average with consistent twice-weekly attendance.",
+      "focus": "Bridging, basic guard, break-falls, following instructions",
+      "milestone": "Demonstrate three fundamental movements cleanly and show good attitude on the mat.",
+      "parentNote": "Grey belt is the first recognition that your child is showing real commitment."
+    },
+    {
+      "id": "yellow",
+      "label": "Yellow Belt",
+      "color": "#facc15",
+      "textColor": "#713f12",
+      "stripe": "#ca8a04",
+      "quote": "Now you are starting to see how the pieces connect. Yellow belt students ask better questions because they are actually thinking during the roll — not just surviving.",
+      "time": "6–12 months",
+      "timeDetail": "Average with regular attendance and active participation.",
+      "focus": "Guard concepts, basic sweeps, GB culture and values",
+      "milestone": "Show basic guard maintenance and attempt at least one sweep during a round.",
+      "parentNote": "Yellow belt students begin showing real Jiu-Jitsu thinking. A big confidence moment."
+    },
+    {
+      "id": "orange",
+      "label": "Orange Belt",
+      "color": "#f97316",
+      "textColor": "#ffffff",
+      "stripe": "#ea580c",
+      "quote": "You are not just surviving the roll anymore — you are thinking during it. Orange belt is where real Jiu-Jitsu starts clicking into place. This is exciting.",
+      "time": "1–2 years",
+      "timeDetail": "Requires consistent training and demonstrated technical growth.",
+      "focus": "Sweeps, escapes, introduction to basic submissions",
+      "milestone": "Demonstrate one complete escape from a bad position under light resistance.",
+      "parentNote": "Orange belt students start helping newer students feel welcome. Leadership is emerging."
+    },
+    {
+      "id": "green",
+      "label": "Green Belt",
+      "color": "#22c55e",
+      "textColor": "#ffffff",
+      "stripe": "#16a34a",
+      "quote": "This is where a lot of kids really start to fly. Green belt means you can hold your own — and maybe even make it interesting for a blue belt. You have come so far.",
+      "time": "2–3 years",
+      "timeDetail": "Significant mat time and demonstrated technique chains.",
+      "focus": "Technique chains, guard passing, pressure, reading your opponent",
+      "milestone": "Demonstrate a two-step technique chain and show positional awareness throughout a round.",
+      "parentNote": "Green belts are leaders on the mat. They inspire newer students just by being there."
+    },
+    {
+      "id": "blue",
+      "label": "Blue Belt",
+      "color": "#2563eb",
+      "textColor": "#ffffff",
+      "stripe": "#1d4ed8",
+      "quote": "Blue belt means you have crossed into the adult world of Jiu-Jitsu. That is a serious achievement. Professor Andar is proud. Coach Trenell is proud. You absolutely should be proud.",
+      "time": "3+ years",
+      "timeDetail": "Major milestone — assessment with Professor required.",
+      "focus": "Full adult curriculum begins — complete BJJ game development",
+      "milestone": "Professor assessment — this is a significant life achievement, not just a belt.",
+      "parentNote": "Kids blue belt is rare and meaningful. This student has years of dedication behind them."
+    }
+  ],
+  "adult": [
+    {
+      "id": "white",
+      "label": "White Belt",
+      "color": "#e5e7eb",
+      "textColor": "#1f2937",
+      "stripe": "#9ca3af",
+      "quote": "One year of consistent training. That is the only goal right now. Do not worry about submissions — learn to survive, learn to tap smart, and learn to love the process.",
+      "time": "0–18 months",
+      "timeDetail": "No fixed timeline — consistency matters more than speed.",
+      "focus": "Survival, basic positions, tapping intelligently, showing up",
+      "milestone": "Consistent attendance and basic positional awareness. Attitude matters as much as technique.",
+      "parentNote": ""
+    },
+    {
+      "id": "blue",
+      "label": "Blue Belt",
+      "color": "#2563eb",
+      "textColor": "#ffffff",
+      "stripe": "#1d4ed8",
+      "quote": "Blue belt means you understand how Jiu-Jitsu actually works. You are not just reacting anymore — you are starting to anticipate. That is a big shift and it feels good.",
+      "time": "1.5–5 years",
+      "timeDetail": "Highly individual. Some people take longer and that is completely fine.",
+      "focus": "Guard, passing, basic submissions, timing, reading the roll",
+      "milestone": "Professor assessment — no standardized test. Readiness is felt, not measured.",
+      "parentNote": ""
+    },
+    {
+      "id": "purple",
+      "label": "Purple Belt",
+      "color": "#7c3aed",
+      "textColor": "#ffffff",
+      "stripe": "#6d28d9",
+      "quote": "Purple belts are dangerous people on the mat. You start building your own game here — your guards, your finishes, your counters. No two purple belts look the same.",
+      "time": "2–5 years at blue",
+      "timeDetail": "Purple belt is where personal style emerges. The journey accelerates.",
+      "focus": "Personal game development, leg entries, counters, competition if desired",
+      "milestone": "Consistent rolling with higher belts at a competitive level and beginning to mentor others.",
+      "parentNote": ""
+    },
+    {
+      "id": "brown",
+      "label": "Brown Belt",
+      "color": "#92400e",
+      "textColor": "#ffffff",
+      "stripe": "#78350f",
+      "quote": "Brown belt is the most underrated belt in BJJ. You are a serious threat to almost anyone. The focus now is refinement — sharpening everything, removing anything wasted.",
+      "time": "1–3 years at purple",
+      "timeDetail": "Brown belt is the final step before black. Many consider it the most growth-rich period.",
+      "focus": "Refinement, pressure, early teaching ability, competition awareness",
+      "milestone": "Beginning to mentor lower belts formally and demonstrating mastery of core positions.",
+      "parentNote": ""
+    },
+    {
+      "id": "black",
+      "label": "Black Belt",
+      "color": "#111827",
+      "textColor": "#ffffff",
+      "stripe": "#C8102E",
+      "quote": "This took roughly ten years of your life. Ten years of tapping, learning, drilling, and choosing to show up on the hard days. Oss. You earned every single second of this.",
+      "time": "~10 years total",
+      "timeDetail": "The journey to black belt is not a race. It is a complete transformation.",
+      "focus": "Mastery, teaching, competition at elite level if desired, giving back to the community",
+      "milestone": "Professor-level assessment — a lifetime achievement recognised by the entire GB family.",
+      "parentNote": ""
+    }
+  ]
+}

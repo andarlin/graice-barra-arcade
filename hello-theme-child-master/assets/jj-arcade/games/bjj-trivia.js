@@ -1,7 +1,7 @@
 /* ==========================================================================
    bjj-trivia.js — GB Trivia Quiz
    JJA-022 · Gracie Barra Lake Country · Jiu-Jitsu Arcade
-   Version: 3.1.0
+   Version: 4.0.1 — CT-002 Time Attack Mode polish
 
    Assets confirmed live on IONOS:
      /assets/jj-arcade/cards/gb-trenell.webp
@@ -35,7 +35,9 @@
 
   var IMG = {
     academy : CARDS + 'gb_academy.webp',
-    coach   : CARDS + 'gb-trenell.webp'
+    coach        : CARDS + 'gb-trenell.webp',
+    coachNice    : CARDS + 'gb-trenell-nice.webp',
+    coachGoodTry : CARDS + 'gb-trenell-good-try.webp'
   };
 
   /* ── CONFIG ─────────────────────────────────────────────────────────────── */
@@ -45,6 +47,11 @@
     autoAdvanceMs       : 1900,
     kidsAutoAdvanceMs   : 2800,
     pointsPerCorrect    : 10,
+    timeAttackSeconds   : 60,
+    timeAttackCorrect   : 100,
+    timeAttackFastBonus : 25,
+    timeAttackStreak3   : 50,
+    timeAttackStreak5   : 100,
     defaultMode         : 'kids',
     twBaseMs            : 32,
     twJitterMs          : 18,
@@ -73,7 +80,15 @@
         { min:7, belt:'Brown',  label:'Brown Belt',  color:'#92400e', tc:'#ffffff', msg:'Advanced knowledge. Sharp understanding of GB and BJJ.' },
         { min:9, belt:'Black',  label:'Black Belt',  color:'#111827', tc:'#ffffff', msg:'Elite level knowledge. Oss.' }
       ]
-    }
+    },
+
+    timeAttackRanks: [
+      { min:0,    belt:'White',  label:'White Belt Thinker',        color:'#e5e7eb', tc:'#1f2937', msg:'Good start. Keep learning the basics and try again.' },
+      { min:400,  belt:'Grey',   label:'Grey Belt Brain',           color:'#d1d5db', tc:'#111827', msg:'Nice work. You are starting to recognize key Jiu-Jitsu ideas.' },
+      { min:800,  belt:'Blue',   label:'Blue Belt Mindset',         color:'#2563eb', tc:'#ffffff', msg:'Strong focus. You know your positions, culture, and techniques.' },
+      { min:1300, belt:'Purple', label:'Purple Belt Problem Solver', color:'#7c3aed', tc:'#ffffff', msg:'Excellent. You are thinking like a real grappler.' },
+      { min:1800, belt:'Black',  label:'Black Belt Brain',          color:'#111827', tc:'#ffffff', msg:'Outstanding. Coach Trenell is seriously impressed.' }
+    ]
   };
 
   /* ── STATE ───────────────────────────────────────────────────────────────── */
@@ -87,6 +102,15 @@
     score   : 0,
     answered: false,
     phase   : 'select',
+    challenge: 'classic',
+    timeLeft : 0,
+    timerT   : null,
+    deadline : 0,
+    totalAnswered: 0,
+    correctCount : 0,
+    streak       : 0,
+    bestStreak   : 0,
+    questionStart: 0,
     advT    : null,
     typeT   : null
   };
@@ -102,14 +126,35 @@
     return a;
   }
 
-  function lsKey()      { return 'jja_trivia_' + S.mode + '_' + S.cat; }
+  function lsKey()      { return 'jja_trivia_' + S.challenge + '_' + S.mode + '_' + S.cat; }
   function getHS()      { try { return parseInt(localStorage.getItem(lsKey()) || '0', 10); } catch(e) { return 0; } }
   function setHS(v)     { try { localStorage.setItem(lsKey(), v); } catch(e) {} }
 
   function getBelt(score) {
-    var ranks = CFG.belts[S.mode] || CFG.belts.kids;
+    var ranks = S.challenge === 'timeAttack' ? CFG.timeAttackRanks : (CFG.belts[S.mode] || CFG.belts.kids);
     for (var i = ranks.length - 1; i >= 0; i--) { if (score >= ranks[i].min) return ranks[i]; }
     return ranks[0];
+  }
+
+  function isTimeAttack() { return S.challenge === 'timeAttack'; }
+
+  function fmtTime(sec) {
+    sec = Math.max(0, parseInt(sec || 0, 10));
+    return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  }
+
+  function getTAKey() { return 'jja_trivia_ta_best_' + S.mode + '_' + S.cat; }
+  function getTABest() { try { return parseInt(localStorage.getItem(getTAKey()) || '0', 10); } catch(e) { return 0; } }
+  function setTABest(v) { try { localStorage.setItem(getTAKey(), v); } catch(e) {} }
+
+  function coachLine(kind) {
+    var lines = {
+      correct: ['Nice!', 'Great answer!', 'Coach Trenell approves!', 'Sharp Jiu-Jitsu brain!', 'That is correct!'],
+      wrong: ['Good try!', 'Keep going!', 'That one was tricky!', 'Stay focused!', 'Shake it off!'],
+      pressure: ['Final seconds!', 'Quick thinking!', 'Last push!', 'Keep answering!', 'Do not stop now!']
+    };
+    var pool = lines[kind] || lines.correct;
+    return pool[Math.floor(Math.random() * pool.length)];
   }
 
   function getCat(id) {
@@ -136,11 +181,12 @@
   function clearT() {
     if (S.advT)  { clearTimeout(S.advT);  S.advT  = null; }
     if (S.typeT) { clearTimeout(S.typeT); S.typeT = null; }
+    if (S.timerT) { clearInterval(S.timerT); S.timerT = null; }
   }
 
   /* ── TYPEWRITER ──────────────────────────────────────────────────────────── */
 
-  function typewrite(textNode, cursorEl, coachEl, dotsEl, micEl, answersEl, tapHintEl, text) {
+  function typewrite(textNode, cursorEl, coachEl, dotsEl, micEl, answersEl, tapHintEl, text, onDone) {
     var chars = text.split('');
     var i = 0;
     textNode.nodeValue = '';
@@ -165,6 +211,7 @@
         setTimeout(function() {
           if (answersEl) answersEl.classList.add('jjt-answers--visible');
           if (tapHintEl) tapHintEl.classList.add('jjt-hint--show');
+          if (typeof onDone === 'function') onDone();
         }, 160);
         return;
       }
@@ -326,6 +373,28 @@
       '.jjt-r-btn.secondary:hover{background:#e5e7eb;transform:translateY(-1px);}',
       '.jjt-r-btn.trial{background:#111827;color:#fff;}',
       '.jjt-r-btn.trial:hover{background:#000;transform:translateY(-2px);}',
+
+      /* time attack */
+      '.jjt-challenge-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:2px;}',
+      '.jjt-challenge-btn{border:2px solid #e5e7eb;border-radius:14px;background:#f9fafb;padding:12px 10px;text-align:left;cursor:pointer;transition:all .18s ease;font-family:inherit;}',
+      '.jjt-challenge-btn:hover{border-color:#C8102E;transform:translateY(-2px);box-shadow:0 8px 18px rgba(200,16,46,.11);}',
+      '.jjt-challenge-btn.active{border-color:#C8102E;background:#fff5f6;color:#C8102E;}',
+      '.jjt-challenge-btn strong{display:block;font-size:13px;font-weight:900;margin-bottom:2px;}',
+      '.jjt-challenge-btn small{display:block;font-size:11px;font-weight:700;color:#9ca3af;line-height:1.25;}',
+      '.jjt-challenge-btn.active small{color:#be123c;}',
+      '.jjt-hud--ta{grid-template-columns:1fr 1fr 1fr 1fr;}',
+      '.jjt-time-val{color:#111827;}',
+      '.jjt-time-val.low{color:#C8102E;animation:jjt-timer-pulse .65s ease-in-out infinite;}',
+      '@keyframes jjt-timer-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}',
+      '.jjt-timebar{height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:-3px 0 14px;}',
+      '.jjt-timebar-fill{height:100%;width:100%;background:linear-gradient(90deg,#16a34a,#facc15,#C8102E);border-radius:999px;transition:width .25s linear;}',
+      '.jjt-feedback-pill{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:6;background:#fff;color:#111827;border:2px solid rgba(255,255,255,.75);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:900;box-shadow:0 10px 24px rgba(0,0,0,.18);opacity:0;pointer-events:none;}',
+      '.jjt-feedback-pill.show{animation:jjt-pill-pop .7s ease-out forwards;}',
+      '@keyframes jjt-pill-pop{0%{opacity:0;transform:translateX(-50%) translateY(8px) scale(.9)}20%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.04)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-8px) scale(.98)}}',
+      '.jjt-ta-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 16px;}',
+      '.jjt-ta-stat{background:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;padding:10px;}',
+      ".jjt-ta-stat strong{display:block;font-family:\"Barlow Condensed\",sans-serif;font-size:24px;font-weight:900;color:#C8102E;line-height:1;}",
+      '.jjt-ta-stat span{display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-top:4px;}',
       /* responsive */
       '@media(max-width:820px){.jjt-select{grid-template-columns:1fr;}}',
       /* 700px: stack scene elements, single-col answers, constrain to viewport */
@@ -337,8 +406,10 @@
         '.jjt-bubble::before,.jjt-bubble::after{display:none;}',
         '.jjt-qtext{font-size:17px;}',
         '.jjt-hud{grid-template-columns:1fr 1fr;}',
+        '.jjt-hud--ta{grid-template-columns:1fr 1fr;}',
         '.jjt-hud-card:nth-child(2){grid-column:1/-1;}',
-        '.jjt-mode-grid{grid-template-columns:1fr;}',
+        '.jjt-hud--ta .jjt-hud-card:nth-child(2){grid-column:auto;}',
+        '.jjt-mode-grid,.jjt-challenge-grid{grid-template-columns:1fr;}',
         /* Adult stage stacks on mobile */
         '.jjt-adult-stage{grid-template-columns:1fr;}',
         '.jjt-prof-panel{height:220px;position:relative;}',
@@ -362,7 +433,7 @@
         '.jjt-hud-card{padding:8px 10px;}',
         '.jjt-hud-val{font-size:15px;}',
         '.jjt-scene{min-height:440px;}',
-        '.jjt-final{font-size:54px;}',
+        '.jjt-final{font-size:54px;gap:7px;}','.jjt-final span{font-size:22px;margin-bottom:6px;}',
       '}'
     ].join('');
     document.head.appendChild(s);
@@ -408,6 +479,21 @@
       : 'Full BJJ terminology, GB history, and training knowledge.';
     panel.appendChild(mh);
 
+    /* Challenge */
+    panel.appendChild(el('div', 'jjt-lbl', 'Challenge'));
+    var chg = el('div', 'jjt-challenge-grid');
+    [
+      { id:'classic', label:'Classic Quiz', meta:'10 questions · no timer' },
+      { id:'timeAttack', label:'Time Attack', meta:'60 seconds · streak bonuses' }
+    ].forEach(function(ch) {
+      var btn = el('button', 'jjt-challenge-btn' + (S.challenge === ch.id ? ' active' : ''));
+      btn.type = 'button';
+      btn.innerHTML = '<strong>'+esc(ch.label)+'</strong><small>'+esc(ch.meta)+'</small>';
+      btn.addEventListener('click', function() { S.challenge = ch.id; renderSelect(container); });
+      chg.appendChild(btn);
+    });
+    panel.appendChild(chg);
+
     /* Category */
     panel.appendChild(el('div', 'jjt-lbl', 'Category'));
     var cg = el('div', 'jjt-cat-grid');
@@ -420,7 +506,7 @@
       card.innerHTML =
         '<div class="jjt-cat-pip">'+esc(cat.short)+'</div>' +
         '<div class="jjt-cat-name">'+esc(cat.label)+'</div>' +
-        '<div class="jjt-cat-meta">'+count+' qs'+(hs>0?' · Best '+hs+'/10':'')+'</div>';
+        '<div class="jjt-cat-meta">'+count+' qs'+(hs>0?(isTimeAttack()?' · Best '+hs+' pts':' · Best '+hs+'/10'):'')+'</div>';
       card.addEventListener('click', function() { S.cat = cat.id; renderSelect(container); });
       cg.appendChild(card);
     });
@@ -428,7 +514,7 @@
 
     var sb = el('button', 'jjt-start');
     sb.type = 'button';
-    sb.innerHTML = 'Start Quiz <strong>▶</strong>';
+    sb.innerHTML = (isTimeAttack() ? 'Start Time Attack' : 'Start Quiz') + ' <strong>▶</strong>';
     sb.addEventListener('click', function() { startGame(container); });
     panel.appendChild(sb);
 
@@ -442,20 +528,85 @@
   function startGame(container) {
     var pool = getPool();
     if (!pool.length) { alert('No questions loaded. Verify JSON files are deployed.'); return; }
-    S.session = shuffle(pool).slice(0, Math.min(CFG.questionsPerSession, pool.length));
-    S.idx = 0; S.score = 0; S.phase = 'game';
+    S.session = isTimeAttack() ? shuffle(pool) : shuffle(pool).slice(0, Math.min(CFG.questionsPerSession, pool.length));
+    S.idx = 0;
+    S.score = 0;
+    S.phase = 'game';
+    S.totalAnswered = 0;
+    S.correctCount = 0;
+    S.streak = 0;
+    S.bestStreak = 0;
+    S.timeLeft = CFG.timeAttackSeconds;
+    S.deadline = 0;
     renderQuestion(container);
+  }
+
+
+  /* ── TIME ATTACK TIMER ──────────────────────────────────────────────────── */
+
+  function updateTimerUI(container) {
+    var tv = document.getElementById('jjt-time-el');
+    var tf = document.getElementById('jjt-time-fill');
+    if (tv) {
+      tv.textContent = fmtTime(S.timeLeft);
+      if (S.timeLeft <= 10) tv.classList.add('low');
+      else tv.classList.remove('low');
+    }
+    if (tf) tf.style.width = Math.max(0, (S.timeLeft / CFG.timeAttackSeconds) * 100) + '%';
+  }
+
+  function startTimeAttackTimer(container) {
+    if (!isTimeAttack() || S.timerT) return;
+    S.deadline = Date.now() + (S.timeLeft * 1000);
+    updateTimerUI(container);
+    S.timerT = setInterval(function() {
+      S.timeLeft = Math.max(0, Math.ceil((S.deadline - Date.now()) / 1000));
+      updateTimerUI(container);
+      if (S.timeLeft <= 0) {
+        if (S.timerT) { clearInterval(S.timerT); S.timerT = null; }
+        renderResults(container);
+      }
+    }, 200);
+  }
+
+  function ensureTimeAttackQuestionPool() {
+    if (!isTimeAttack()) return;
+    if (S.idx < S.session.length) return;
+    var pool = getPool();
+    if (pool.length) S.session = S.session.concat(shuffle(pool));
+  }
+
+  function showFeedback(wrap, text) {
+    var pill = wrap.querySelector('.jjt-feedback-pill');
+    if (!pill) return;
+    pill.textContent = text;
+    pill.classList.remove('show');
+    void pill.offsetWidth;
+    pill.classList.add('show');
+  }
+
+  function setCoachImage(wrap, src) {
+    var ci = wrap.querySelector('.jjt-coach');
+    if (!ci || !src) return;
+    ci.onerror = function() { ci.onerror = null; ci.src = IMG.coach; };
+    ci.src = src;
   }
 
   /* ── RENDER: QUESTION ────────────────────────────────────────────────────── */
 
   function renderQuestion(container) {
+    ensureTimeAttackQuestionPool();
     if (S.idx >= S.session.length) { renderResults(container); return; }
-    clearT();
+    if (isTimeAttack()) {
+      if (S.advT) { clearTimeout(S.advT); S.advT = null; }
+      if (S.typeT) { clearTimeout(S.typeT); S.typeT = null; }
+    } else {
+      clearT();
+    }
 
     var q      = S.session[S.idx];
-    var total  = S.session.length;
-    var pct    = (S.idx / total) * 100;
+    var total  = isTimeAttack() ? CFG.timeAttackSeconds : S.session.length;
+    var pct    = isTimeAttack() ? ((CFG.timeAttackSeconds - S.timeLeft) / CFG.timeAttackSeconds) * 100 : (S.idx / total) * 100;
     var catDef = getCat(q.category);
     S.answered = false;
     container.innerHTML = '';
@@ -463,19 +614,39 @@
     var wrap = el('div', 'jjt');
 
     /* HUD */
-    var hud = el('div', 'jjt-hud');
-    [{l:'Question',v:(S.idx+1)+'/'+total,id:'',cls:''},{l:'Category',v:catDef.label,id:'',cls:''},{l:'Score',v:S.score+' pts',id:'jjt-score-el',cls:'jjt-hud-score'}].forEach(function(item) {
+    var hud = el('div', 'jjt-hud' + (isTimeAttack() ? ' jjt-hud--ta' : ''));
+    var hudItems = isTimeAttack()
+      ? [
+          {l:'Time',v:fmtTime(S.timeLeft),id:'jjt-time-el',cls:'jjt-time-val'},
+          {l:'Score',v:S.score+' pts',id:'jjt-score-el',cls:'jjt-hud-score'},
+          {l:'Streak',v:S.streak,id:'jjt-streak-el',cls:''},
+          {l:'Answered',v:S.totalAnswered,id:'jjt-answered-el',cls:''}
+        ]
+      : [
+          {l:'Question',v:(S.idx+1)+'/'+total,id:'',cls:''},
+          {l:'Category',v:catDef.label,id:'',cls:''},
+          {l:'Score',v:S.score+' pts',id:'jjt-score-el',cls:'jjt-hud-score'}
+        ];
+    hudItems.forEach(function(item) {
       var c = el('div','jjt-hud-card');
       c.innerHTML='<span class="jjt-hud-lbl">'+item.l+'</span><span class="jjt-hud-val '+item.cls+'"'+(item.id?' id="'+item.id+'"':'')+'>'+item.v+'</span>';
       hud.appendChild(c);
     });
     wrap.appendChild(hud);
 
-    /* Progress */
-    var pw = el('div','jjt-prog');
-    var pb = el('div','jjt-prog-bar');
-    pb.style.width = pct + '%';
-    pw.appendChild(pb); wrap.appendChild(pw);
+    if (isTimeAttack()) {
+      var tw = el('div','jjt-timebar');
+      var tf = el('div','jjt-timebar-fill');
+      tf.id = 'jjt-time-fill';
+      tf.style.width = Math.max(0, (S.timeLeft / CFG.timeAttackSeconds) * 100) + '%';
+      tw.appendChild(tf); wrap.appendChild(tw);
+    } else {
+      /* Progress */
+      var pw = el('div','jjt-prog');
+      var pb = el('div','jjt-prog-bar');
+      pb.style.width = pct + '%';
+      pw.appendChild(pb); wrap.appendChild(pw);
+    }
 
     /* Answers (built now, hidden until typing done) */
     var indices = shuffle([0,1,2,3].slice(0, q.answers.length));
@@ -503,6 +674,7 @@
       bg.style.backgroundImage = 'url("'+IMG.academy+'")';
       scene.appendChild(bg);
       scene.appendChild(el('div', 'jjt-scene-overlay'));
+      scene.appendChild(el('div', 'jjt-feedback-pill'));
 
       /* Coach */
       var cw  = el('div', 'jjt-coach-wrap');
@@ -542,10 +714,14 @@
       util.appendChild(back); wrap.appendChild(util);
       container.appendChild(wrap);
 
-      /* Fire typewriter */
+      /* Fire Coach Trenell typewriter. In Time Attack, the first timer starts after
+         the first typed question appears, then keeps running for the full challenge. */
       setTimeout(function() {
-        typewrite(tNode, cur, ci, dots, mic, aw, tapH, q.question);
-      }, 280);
+        typewrite(tNode, cur, ci, dots, mic, aw, tapH, q.question, function() {
+          S.questionStart = Date.now();
+          if (isTimeAttack()) startTimeAttackTimer(container);
+        });
+      }, isTimeAttack() ? 120 : 280);
 
     } else {
       /* ── ADULT: Professor Andar video panel + dark question card ── */
@@ -605,7 +781,10 @@
       util2.appendChild(back2); wrap.appendChild(util2);
       container.appendChild(wrap);
 
-      setTimeout(function() { aw.classList.add('jjt-answers--visible'); }, 80);
+      setTimeout(function() {
+        aw.classList.add('jjt-answers--visible');
+        if (isTimeAttack()) { S.questionStart = Date.now(); startTimeAttackTimer(container); }
+      }, 80);
     }
   }
 
@@ -613,11 +792,29 @@
 
   function handleAnswer(q, selectedIdx, selectedBtn, aw, expl, wrap, container) {
     if (S.answered) return;
-    clearT();
+    if (S.advT) { clearTimeout(S.advT); S.advT = null; }
+    if (S.typeT) { clearTimeout(S.typeT); S.typeT = null; }
     S.answered = true;
 
     var correct = selectedIdx === q.correct;
-    if (correct) S.score += CFG.pointsPerCorrect;
+    var earned = 0;
+    S.totalAnswered++;
+    if (correct) {
+      S.correctCount++;
+      S.streak++;
+      if (S.streak > S.bestStreak) S.bestStreak = S.streak;
+      if (isTimeAttack()) {
+        earned += CFG.timeAttackCorrect;
+        if (Date.now() - S.questionStart <= 5000) earned += CFG.timeAttackFastBonus;
+        if (S.streak > 0 && S.streak % 5 === 0) earned += CFG.timeAttackStreak5;
+        else if (S.streak > 0 && S.streak % 3 === 0) earned += CFG.timeAttackStreak3;
+      } else {
+        earned += CFG.pointsPerCorrect;
+      }
+      S.score += earned;
+    } else {
+      S.streak = 0;
+    }
 
     /* Stop speaking */
     var ci   = wrap.querySelector('.jjt-coach');
@@ -648,10 +845,14 @@
     /* Score */
     var se = document.getElementById('jjt-score-el');
     if (se) se.textContent = S.score + ' pts';
+    var ste = document.getElementById('jjt-streak-el');
+    if (ste) ste.textContent = S.streak;
+    var ae = document.getElementById('jjt-answered-el');
+    if (ae) ae.textContent = S.totalAnswered;
 
     /* Flash + Professor Andar wave on correct */
     if (correct) {
-      var flash = el('div', 'jjt-flash', '+10');
+      var flash = el('div', 'jjt-flash', '+' + earned);
       document.body.appendChild(flash);
       setTimeout(function() { if (flash.parentNode) flash.parentNode.removeChild(flash); }, 820);
 
@@ -667,6 +868,11 @@
       }
     }
 
+    if (S.mode === 'kids') {
+      showFeedback(wrap, correct ? coachLine('correct') : coachLine('wrong'));
+      setCoachImage(wrap, correct ? IMG.coachNice : IMG.coachGoodTry);
+    }
+
     /* Explanation */
     if (q.explanation) {
       var prefix = S.mode === 'kids'
@@ -677,25 +883,40 @@
     }
 
     /* Advance */
-    var delay = S.mode === 'kids' ? CFG.kidsAutoAdvanceMs : CFG.autoAdvanceMs;
-    S.advT = setTimeout(function() { S.idx++; renderQuestion(container); }, delay);
+    var delay = isTimeAttack() ? 720 : (S.mode === 'kids' ? CFG.kidsAutoAdvanceMs : CFG.autoAdvanceMs);
+    S.advT = setTimeout(function() {
+      if (isTimeAttack() && S.timeLeft <= 0) { renderResults(container); return; }
+      S.idx++;
+      renderQuestion(container);
+    }, delay);
   }
 
   /* ── RENDER: RESULTS ─────────────────────────────────────────────────────── */
 
   function renderResults(container) {
+    if (S.advT) { clearTimeout(S.advT); S.advT = null; }
+    if (S.typeT) { clearTimeout(S.typeT); S.typeT = null; }
     S.phase = 'results';
     container.innerHTML = '';
 
+    if (S.timerT) { clearInterval(S.timerT); S.timerT = null; }
     var n10  = Math.round(S.score / CFG.pointsPerCorrect);
-    var rank = getBelt(n10);
-    var prev = getHS();
-    var newB = n10 > prev;
-    if (newB) setHS(n10);
+    var metric = isTimeAttack() ? S.score : n10;
+    var rank = getBelt(metric);
+    var prev = isTimeAttack() ? getTABest() : getHS();
+    var newB = metric > prev;
+    if (newB) { if (isTimeAttack()) setTABest(metric); else setHS(metric); }
 
     var catLbl = S.cat === 'all' ? 'All Questions' : getCat(S.cat).label;
 
     var copy = (function() {
+      if (isTimeAttack()) {
+        if (S.score < 400) return 'Good start. Try again and aim for faster answers and a stronger streak.';
+        if (S.score < 800) return 'Nice run. You are building speed and Jiu-Jitsu knowledge at the same time.';
+        if (S.score < 1300) return 'Strong challenge score. Coach Trenell can tell you are focused.';
+        if (S.score < 1800) return 'Excellent run. That is sharp problem-solving under pressure.';
+        return 'Huge score. That is Black Belt Brain energy.';
+      }
       if (S.mode === 'kids') {
         if (n10 <= 3) return 'Great starting point. A trial week is perfect for learning these basics on the mat.';
         if (n10 <= 6) return 'Nice work! You already know some Jiu-Jitsu ideas — class will build even more confidence.';
@@ -716,9 +937,13 @@
       '<div class="jjt-rank-lbl">'+esc(rank.label)+'</div>' +
       '<p class="jjt-rank-msg">'+esc(rank.msg)+'</p>' +
       '<div class="jjt-score-wrap">' +
-        '<div class="jjt-final">'+n10+'<span>/'+S.session.length+'</span></div>' +
-        '<div class="jjt-final-lbl">Questions Correct</div>' +
-        (newB?'<div class="jjt-new-best">🏆 New Personal Best!</div>':'<div class="jjt-prev-best">Best: '+prev+'/'+S.session.length+'</div>') +
+        (isTimeAttack()
+          ? '<div class="jjt-final">'+S.score+'<span> pts</span></div><div class="jjt-final-lbl">Time Attack Score</div>'
+          : '<div class="jjt-final">'+n10+'<span>/'+S.session.length+'</span></div><div class="jjt-final-lbl">Questions Correct</div>') +
+        (isTimeAttack()
+          ? '<div class="jjt-ta-summary"><div class="jjt-ta-stat"><strong>'+S.correctCount+'</strong><span>Correct</span></div><div class="jjt-ta-stat"><strong>'+S.totalAnswered+'</strong><span>Answered</span></div><div class="jjt-ta-stat"><strong>'+S.bestStreak+'</strong><span>Best Streak</span></div></div>'
+          : '') +
+        (newB?'<div class="jjt-new-best">🏆 New Personal Best!</div>':'<div class="jjt-prev-best">Best: '+prev+(isTimeAttack()?' pts':'/'+S.session.length)+'</div>') +
       '</div>' +
       '<p class="jjt-res-copy">'+esc(copy)+'</p>' +
       '<div class="jjt-res-btns">' +
@@ -752,7 +977,7 @@
       mount: function(container) {
         injectStyles(); clearT();
         S.mode = CFG.defaultMode; S.cat = 'all';
-        S.session = []; S.idx = 0; S.score = 0; S.answered = false;
+        S.session = []; S.idx = 0; S.score = 0; S.answered = false; S.challenge = 'classic'; S.timeLeft = 0; S.totalAnswered = 0; S.correctCount = 0; S.streak = 0; S.bestStreak = 0;
         loadQuestions(function() { renderSelect(container); });
       },
       unmount: function(container) { clearT(); container.innerHTML = ''; }

@@ -146,6 +146,11 @@
     if (overlayEl) overlayEl.classList.add('hm-hidden');
     updateWrongDisplay();
     updateWordDisplay();
+
+    /* ── CT-001: Coach Trenell intro ── */
+    if (window.JJHangmanHost) {
+      window.JJHangmanHost.init(mountEl, currentCategory);
+    }
   }
 
   function handleGuess(letter) {
@@ -157,11 +162,19 @@
       if (keyBtn) keyBtn.classList.add('hm-key-correct');
       updateWordDisplay();
       checkWin();
+      /* ── CT-001: correct letter reaction ── */
+      if (!gameOver && window.JJHangmanHost) {
+        window.JJHangmanHost.onCorrect();
+      }
     } else {
       if (keyBtn) keyBtn.classList.add('hm-key-wrong');
       revealBodyPart(wrongCount);
       wrongCount++;
       updateWrongDisplay();
+      /* ── CT-001: wrong guess reaction (pass remaining guesses) ── */
+      if (!gameOver && window.JJHangmanHost) {
+        window.JJHangmanHost.onWrong(MAX_WRONG - wrongCount);
+      }
       checkLoss();
     }
   }
@@ -186,7 +199,12 @@
 
   function checkWin() {
     var won = currentWord.split('').every(function (ch) { return guessedLetters[ch]; });
-    if (won) { gameOver = true; showOverlay(true); }
+    if (won) {
+      gameOver = true;
+      /* ── CT-001: win reaction ── */
+      if (window.JJHangmanHost) window.JJHangmanHost.onWin();
+      showOverlay(true);
+    }
   }
 
   function checkLoss() {
@@ -194,6 +212,8 @@
       gameOver = true;
       currentWord.split('').forEach(function (ch) { guessedLetters[ch] = true; });
       updateWordDisplay();
+      /* ── CT-001: lose reaction ── */
+      if (window.JJHangmanHost) window.JJHangmanHost.onLose();
       showOverlay(false);
     }
   }

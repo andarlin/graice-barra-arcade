@@ -2,16 +2,16 @@
 /**
  * Template Name: Jiu-Jitsu Arcade
  * @package hello-theme-child-master
- * Version: 2.9.0 — Netflix-style layout | cinematic hero + carousel
+ * Version: 2.9.1 — Fix: stats bar markup + hangman-host.js script tag
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 $child_uri = get_stylesheet_directory_uri();
-$ver       = '2.9.0';
+$ver       = '2.9.1';
 
 /*
  * THUMBNAIL MAP
- * Upload the 7 .webp files to: /assets/jj-arcade/thumbnails/
+ * Upload the 8 .webp files to: /assets/jj-arcade/thumbnails/
  */
 $thumbs = [
     'memory'          => $child_uri . '/assets/jj-arcade/thumbnails/memory_game_thumbnail.webp',
@@ -38,9 +38,7 @@ $thumbs = [
 
     <style data-noptimize="1">
     /* ============================================================
-       JJA PAGE CHROME v2.8 — Netflix-style
-       Touches: hero, carousel, stage wrapper only.
-       jj-arcade.css / jj-memory-game.css / hangman.css untouched.
+       JJA PAGE CHROME v2.9.1
        ============================================================ */
     :root {
         --gb-red:        #C8102E;
@@ -185,7 +183,6 @@ $thumbs = [
     }
     .jja-btn-close-game:hover { border-color: var(--gb-red); color: #fff; }
 
-    /* The actual mount target — id="jj-arcade-stage" preserved */
     .jj-arcade__stage {
         background: var(--bg); padding: 28px 24px;
         min-height: 400px; max-width: 1000px; margin: 0 auto;
@@ -196,14 +193,16 @@ $thumbs = [
         .jj-iframe-wrap iframe { height: 85vh; min-height: 500px; }
     }
 
-    /* ── STATS BAR ── */
+    /* ── STATS BAR — fixed: each stat needs its own .jja-stat wrapper ── */
     .jja-stats {
         display: grid; grid-template-columns: repeat(4,1fr);
         background: var(--bg);
         border-top: 1px solid var(--border);
         border-bottom: 1px solid var(--border);
     }
-    .jja-stat { padding: 14px 8px; text-align: center; }
+    .jja-stat {
+        padding: 14px 8px; text-align: center;
+    }
     .jja-stat + .jja-stat { border-left: 1px solid var(--border); }
     .jja-stat__num {
         font-family: var(--font-display); font-size: 24px; font-weight: 800;
@@ -238,7 +237,6 @@ $thumbs = [
         color: var(--text-muted); letter-spacing: 0.05em;
     }
 
-    /* Scrollable track */
     .jja-carousel-track {
         display: flex; gap: 12px;
         overflow-x: auto;
@@ -249,9 +247,6 @@ $thumbs = [
     }
     .jja-carousel-track::-webkit-scrollbar { display: none; }
 
-    /* ── Individual carousel card ──
-       Class + data-game attributes preserved for router.
-       All old pill CSS overridden here.                    */
     .jja-carousel-track .jj-arcade__nav-btn {
         display: flex !important; flex-direction: column !important;
         align-items: flex-start !important; gap: 0 !important;
@@ -344,7 +339,7 @@ $thumbs = [
         padding: 3px 9px; border-radius: 20px; white-space: nowrap;
     }
 
-    /* ── IFRAME + TEASER (preserved from v2.6) ── */
+    /* ── IFRAME + TEASER ── */
     .jj-iframe-wrap { display:flex; flex-direction:column; align-items:center; gap:12px; }
     .jj-iframe-wrap iframe { width:100%; max-width:960px; height:640px; border:none; border-radius:8px; background:#000; display:block; }
     .jj-iframe-hint { font-size:.78rem; color:#888; text-align:center; }
@@ -411,16 +406,27 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
             </div>
             <button class="jja-btn-close-game" id="jja-btn-close">✕ Back</button>
         </div>
-        <!-- id="jj-arcade-stage" preserved exactly for router -->
         <div class="jj-arcade__stage" id="jj-arcade-stage"></div>
     </div>
 
-    <!-- STATS BAR -->
+    <!-- STATS BAR — FIX: each stat wrapped in its own .jja-stat div -->
     <div class="jja-stats">
-        <div class="jja-stat__num">8</div><div class="jja-stat__lbl">Games</div>
-        <div class="jja-stat"><div class="jja-stat__num">5</div><div class="jja-stat__lbl">Levels</div></div>
-        <div class="jja-stat"><div class="jja-stat__num">4.5★</div><div class="jja-stat__lbl">Rating</div></div>
-        <div class="jja-stat"><div class="jja-stat__num">Free</div><div class="jja-stat__lbl">To Play</div></div>
+        <div class="jja-stat">
+            <div class="jja-stat__num">8</div>
+            <div class="jja-stat__lbl">Games</div>
+        </div>
+        <div class="jja-stat">
+            <div class="jja-stat__num">5</div>
+            <div class="jja-stat__lbl">Levels</div>
+        </div>
+        <div class="jja-stat">
+            <div class="jja-stat__num">4.5★</div>
+            <div class="jja-stat__lbl">Rating</div>
+        </div>
+        <div class="jja-stat">
+            <div class="jja-stat__num">Free</div>
+            <div class="jja-stat__lbl">To Play</div>
+        </div>
     </div>
 
     <!-- CAROUSEL -->
@@ -430,7 +436,6 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
             <span class="jja-carousel-count">8 Available</span>
         </div>
 
-        <!-- id="jj-arcade-nav" + class/data-game preserved for router -->
         <nav class="jja-carousel-track" id="jj-arcade-nav">
 
             <button class="jj-arcade__nav-btn active" data-game="memory">
@@ -495,6 +500,7 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
                     <span class="jja-card-tag">Action</span>
                 </div>
             </button>
+
             <button class="jj-arcade__nav-btn" data-game="trivia">
                 <img class="jja-card-thumb" src="<?php echo esc_url($thumbs['trivia']); ?>" alt="GB Trivia Quiz" loading="lazy"
                      onerror="this.style.background='#12395d';this.removeAttribute('onerror');">
@@ -505,7 +511,6 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
                 </div>
             </button>
 
-
         </nav>
     </div>
 
@@ -513,7 +518,7 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
     <div class="jja-locked-section">
         <div class="jja-locked-header">Coming Soon</div>
         <div class="jja-locked-list">
-          
+
             <button class="jj-arcade__nav-btn--locked" data-teaser="position-builder">
                 <div class="locked-left"><span class="lock-icon">&#128274;</span><span class="locked-name">Position Builder</span></div>
                 <span class="locked-pill">In Development</span>
@@ -536,10 +541,11 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
 wp_footer();
 ?>
 
-<!-- Game Scripts — untouched from v2.6.0 -->
+<!-- Game Scripts -->
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/memory.js?ver=<?php echo $ver; ?>"></script>
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/technique-match.js?ver=<?php echo $ver; ?>"></script>
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/hangman.js?ver=<?php echo $ver; ?>"></script>
+<script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/hangman-host.js?ver=<?php echo $ver; ?>"></script>
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/belt-order.js?ver=<?php echo $ver; ?>"></script>
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/reaction-tap.js?ver=<?php echo $ver; ?>"></script>
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/bjj-trivia.js?ver=<?php echo $ver; ?>"></script>
@@ -547,7 +553,6 @@ wp_footer();
 <script data-noptimize="1">
 var CHILD_URI = '<?php echo $child_uri; ?>';
 
-/* Thumbnail + description metadata for hero swaps */
 var JJA_GAME_META = {
     'memory':          { name:'Memory Game',     tag:'Memory',    desc:'Flip and match GB technique cards. Beat your best time.',    thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/memory_game_thumbnail.webp' },
     'technique-match': { name:'Technique Match', tag:'Knowledge', desc:'Match the move name to the right position card.',            thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/technique_match_thumbnail.webp' },
@@ -559,7 +564,6 @@ var JJA_GAME_META = {
     'trivia':          { name:'GB Trivia Quiz',  tag:'Trivia',    desc:'Coach Trenell quizzes you on GB culture, belts, and BJJ.', thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/trivia_thumbnail.webp' }
 };
 
-/* Arcade config — zero changes from v2.6.0 */
 window.JJ_ARCADE_CONFIG = {
     cardFront: CHILD_URI + '/assets/jj-arcade/cards/jj-card-junior-1.png',
     games: [
@@ -600,7 +604,8 @@ var JJ_TEASERS = {
     'position-builder': {icon:'&#128506;&#65039;',title:'Position Builder',desc:'Arrange techniques in sequence and build your attack chain.'},
     'scenario':         {icon:'&#127919;',title:'Scenario Engine',    desc:'Your opponent moves — what do you do? Make split-second decisions and see where your choices lead.'}
 };
-/* ── HERO CONTROLLER (v2.8) ── */
+
+/* ── HERO CONTROLLER ── */
 (function(){
     var hero      = document.getElementById('jja-hero');
     var heroBg    = document.getElementById('jja-hero-bg');
@@ -633,7 +638,6 @@ var JJ_TEASERS = {
 
     btnPlay.addEventListener('click',function(){
         openStage(activeId);
-        /* Kick the router by re-clicking the active card */
         var activeBtn = document.querySelector('.jja-carousel-track .jj-arcade__nav-btn.active');
         if(activeBtn) activeBtn.dispatchEvent(new MouseEvent('click',{bubbles:true}));
     });
@@ -648,7 +652,7 @@ var JJ_TEASERS = {
     window.JJA_HERO = { updateHero:updateHero, openStage:openStage };
 })();
 
-/* ── ARCADE ROUTER — same as v2.6.0, hero hooks added ── */
+/* ── ARCADE ROUTER ── */
 (function(){
     var stage    = document.getElementById('jj-arcade-stage');
     var liveBtns = document.querySelectorAll('.jj-arcade__nav-btn');
@@ -725,28 +729,24 @@ var JJ_TEASERS = {
     function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
     function clearActive(){liveBtns.forEach(function(b){b.classList.remove('active');});}
 
-    /* Card click */
     liveBtns.forEach(function(btn){
         btn.addEventListener('click',function(){
             var id=btn.getAttribute('data-game');
             var sw=document.getElementById('jja-stage-wrap');
 
             if(sw&&sw.classList.contains('is-visible')){
-                /* Stage open — switch game immediately */
                 clearActive(); btn.classList.add('active');
                 var ne=document.getElementById('jja-playing-name');
                 if(ne)ne.textContent=(JJA_GAME_META[id]||{}).name||id;
                 loadGame(id);
                 sw.scrollIntoView({behavior:'smooth',block:'start'});
             } else {
-                /* Stage hidden — update hero preview only */
                 clearActive(); btn.classList.add('active');
                 if(window.JJA_HERO) window.JJA_HERO.updateHero(id);
             }
         });
     });
 
-    /* Locked click */
     lockBtns.forEach(function(btn){
         btn.addEventListener('click',function(){
             clearActive();
@@ -760,8 +760,6 @@ var JJ_TEASERS = {
             if(sw)sw.scrollIntoView({behavior:'smooth',block:'start'});
         });
     });
-
-    /* Boot — no auto-load; game loads only on Play click */
 
 })();
 </script>
