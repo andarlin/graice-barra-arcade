@@ -1,6 +1,16 @@
 (function () {
   'use strict';
 
+  // Jiu-Jitsu Arcade v2: feedback layer -- optional-chained so the game runs
+  // unchanged if the shared utilities fail to load.
+  var fx = {
+    sfx: function (key) { if (window.JJArcadeAudio) window.JJArcadeAudio.playSfx(key); },
+    vibe: function (p) { if (window.JJArcadeAudio) window.JJArcadeAudio.vibrate(p); },
+    shake: function (el) { if (window.JJArcadeJuice && el) window.JJArcadeJuice.shake(el); },
+    burst: function (el) { if (window.JJArcadeJuice && el) window.JJArcadeJuice.burstFromEl(el); },
+    confetti: function (el) { if (window.JJArcadeJuice && el) window.JJArcadeJuice.confetti(el); }
+  };
+
   var BASE_PATH = '/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/';
   var DATA_PATH = '/wp-content/themes/hello-theme-child-master/assets/jj-arcade/data/hangman.json';
   var MAX_WRONG = 6;
@@ -79,7 +89,7 @@
             '<div class="hm-word-display" id="hm-word-display"></div>' +
             '<div class="hm-status" id="hm-status"></div>' +
             '<div class="hm-keyboard" id="hm-keyboard"></div>' +
-            '<button class="hm-new-game-btn" id="hm-new-game-btn">New Word</button>' +
+            '<button class="hm-new-game-btn jja-pressable" id="hm-new-game-btn">New Word</button>' +
           '</div>' +
         '</div>' +
         '<div class="hm-overlay hm-hidden" id="hm-overlay">' +
@@ -87,7 +97,7 @@
             '<div class="hm-overlay-emoji" id="hm-overlay-emoji"></div>' +
             '<div class="hm-overlay-msg" id="hm-overlay-msg"></div>' +
             '<div class="hm-overlay-word" id="hm-overlay-word"></div>' +
-            '<button class="hm-new-game-btn hm-overlay-btn" id="hm-overlay-btn">Play Again</button>' +
+            '<button class="hm-new-game-btn hm-overlay-btn jja-pressable" id="hm-overlay-btn">Play Again</button>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -112,14 +122,14 @@
       return VISIBLE_CATS.indexOf(key) !== -1;
     }).map(function (key) {
       var cat = allData[key];
-      return '<button class="hm-cat-btn ' + (key === currentCategory ? 'hm-cat-active' : '') + '" data-cat="' + key + '">' + cat.label + '</button>';
+      return '<button class="hm-cat-btn jja-pressable ' + (key === currentCategory ? 'hm-cat-active' : '') + '" data-cat="' + key + '">' + cat.label + '</button>';
     }).join('');
   }
 
   function buildKeyboard() {
     if (!keyboardEl) return;
     keyboardEl.innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(function (l) {
-      return '<button class="hm-key" data-letter="' + l + '">' + l + '</button>';
+      return '<button class="hm-key jja-pressable" data-letter="' + l + '">' + l + '</button>';
     }).join('');
   }
 
@@ -155,6 +165,7 @@
 
   function handleGuess(letter) {
     if (gameOver || guessedLetters[letter]) return;
+    fx.sfx('ui_tap'); // keypress tick (new valid guess registered)
     guessedLetters[letter] = true;
     var keyBtn = keyboardEl ? keyboardEl.querySelector('[data-letter="' + letter + '"]') : null;
     if (keyBtn) keyBtn.disabled = true;
@@ -166,11 +177,19 @@
       if (!gameOver && window.JJHangmanHost) {
         window.JJHangmanHost.onCorrect();
       }
+      if (!gameOver) {
+        fx.sfx('correct'); // correct letter chime
+        fx.vibe('short');
+        fx.burst(wordDisplayEl);
+      }
     } else {
       if (keyBtn) keyBtn.classList.add('hm-key-wrong');
       revealBodyPart(wrongCount);
       wrongCount++;
       updateWrongDisplay();
+      fx.sfx('wrong'); // wrong guess "thud"
+      fx.vibe('double');
+      fx.shake(mountEl ? mountEl.querySelector('.hm-main') : null);
       /* ── CT-001: wrong guess reaction (pass remaining guesses) ── */
       if (!gameOver && window.JJHangmanHost) {
         window.JJHangmanHost.onWrong(MAX_WRONG - wrongCount);
@@ -203,7 +222,10 @@
       gameOver = true;
       /* ── CT-001: win reaction ── */
       if (window.JJHangmanHost) window.JJHangmanHost.onWin();
+      fx.sfx('fanfare'); // win stinger
+      fx.vibe('win');
       showOverlay(true);
+      fx.confetti(overlayEl ? overlayEl.querySelector('.hm-overlay-box') : null);
     }
   }
 
@@ -214,6 +236,8 @@
       updateWordDisplay();
       /* ── CT-001: lose reaction ── */
       if (window.JJHangmanHost) window.JJHangmanHost.onLose();
+      fx.sfx('stinger_lose'); // lose stinger
+      fx.vibe('double');
       showOverlay(false);
     }
   }
@@ -237,15 +261,20 @@
       catContainer.addEventListener('click', function (e) {
         var btn = e.target.closest('.hm-cat-btn');
         if (!btn) return;
+        fx.sfx('ui_tap');
         currentCategory = btn.getAttribute('data-cat');
         document.querySelectorAll('.hm-cat-btn').forEach(function (b) { b.classList.remove('hm-cat-active'); });
         btn.classList.add('hm-cat-active');
         startNewGame();
       });
     }
-    if (newGameBtn) newGameBtn.addEventListener('click', startNewGame);
+    if (newGameBtn) newGameBtn.addEventListener('click', function () {
+      fx.sfx('ui_tap');
+      startNewGame();
+    });
     var overlayBtn = document.getElementById('hm-overlay-btn');
     if (overlayBtn) overlayBtn.addEventListener('click', function () {
+      fx.sfx('ui_tap');
       if (overlayEl) overlayEl.classList.add('hm-hidden');
       startNewGame();
     });

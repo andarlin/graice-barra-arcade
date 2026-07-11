@@ -29,6 +29,14 @@
 (function () {
   'use strict';
 
+  // JJA v2: feedback layer -- optional-chained so the game runs unchanged if the
+  // shared utilities fail to load.
+  var fx = {
+    sfx: function (key) { if (window.JJArcadeAudio) window.JJArcadeAudio.playSfx(key); },
+    vibe: function (p) { if (window.JJArcadeAudio) window.JJArcadeAudio.vibrate(p); },
+    burst: function (elm) { if (window.JJArcadeJuice && elm) window.JJArcadeJuice.burstFromEl(elm); }
+  };
+
   // ── Utility ────────────────────────────────────────────────────────────────
   function el(tag, attrs, children) {
     var e = document.createElement(tag);
@@ -316,6 +324,7 @@
     var btn = el('button', { class: 'rt-play-btn' }, 'GO AGAIN');
     btn.addEventListener('pointerdown', function (e) {
       e.stopPropagation();
+      fx.sfx('ui_tap');
       self._startedAt = Date.now(); // reset phantom-tap guard for new game
       self._resetGame();
     });
@@ -325,6 +334,7 @@
 
   // ── Game flow ─────────────────────────────────────────────────────────────
   Game.prototype._startGame = function () {
+    fx.sfx('ui_tap');
     this._overlay.remove();
     this._answering   = false;
     this._touchStartY = 0;
@@ -374,6 +384,7 @@
     self._imgBtn.classList.remove('rt-btn-highlight');
     self._subBtn.classList.remove('rt-btn-highlight');
 
+    fx.sfx('countdown_tick'); // "react now" cue as each new image appears
     var duration = self.settings.displayTime || 2000;
     self._startTimerBar(duration);
 
@@ -414,6 +425,9 @@
     var pts        = (self.settings.pointsPerCorrect || 100) * multiplier;
     self.score    += pts;
 
+    fx.sfx('correct'); // correct tap chime
+    fx.vibe('short');
+    fx.burst(self._stage);
     self._stage.classList.add('rt-correct');
     self._feedback.textContent = buttonType === 'submission' ? '⚡ SUBMIT!' : '✅ POSITION!';
     self._feedback.className   = 'rt-feedback rt-fb-show rt-fb-correct';
@@ -431,6 +445,8 @@
     self.lives--;
     self._comboEl.textContent = '';
 
+    fx.sfx('wrong'); // wrong tap buzz (rt-shake handles the visual shake)
+    fx.vibe('double');
     self._stage.classList.add('rt-wrong');
     self._feedback.textContent = '❌ WRONG!';
     self._feedback.className   = 'rt-feedback rt-fb-show rt-fb-wrong';
@@ -447,6 +463,18 @@
         self._img.style.display   = 'none';
         self._stage.className     = 'rt-stage';
         self._feedback.className  = 'rt-feedback';
+        // JJA v2: personal-best fanfare (feedback only -- reads/writes a localStorage
+        // best purely to pick the game-over sound; no gameplay, scoring, or UI change).
+        var best = 0;
+        try { best = parseInt(localStorage.getItem('jjReactionTapBest') || '0', 10) || 0; } catch (e) {}
+        if (self.score > best) {
+          try { localStorage.setItem('jjReactionTapBest', String(self.score)); } catch (e) {}
+          fx.sfx('highscore'); // new personal best fanfare
+          fx.vibe('win');
+        } else {
+          fx.sfx('stinger_lose');
+          fx.vibe('double');
+        }
         self._stage.querySelectorAll('.rt-overlay').forEach(function (o) { o.remove(); });
         self._stage.appendChild(self._buildGameOverOverlay());
       }, delay);

@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "arcade-audio-test",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:\\Users\\andar\\AppData\\Local\\Temp\\claude\\C--Users-andar-OneDrive-Documents-Gracie-Barra-Location-Project-Mermory-Game-hello-theme-child-master\\f62efaa0-f8a1-4dee-b88d-8a304fc6c501\\scratchpad\\static-server.js",
+        "C:\\Users\\andar\\OneDrive\\Documents\\Gracie Barra Location Project\\Mermory Game\\hello-theme-child-master\\assets"
+      ],
+      "port": 8934
+    }
+  ]
+}

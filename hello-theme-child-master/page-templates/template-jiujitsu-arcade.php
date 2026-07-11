@@ -183,6 +183,19 @@ $thumbs = [
     }
     .jja-btn-close-game:hover { border-color: var(--gb-red); color: #fff; }
 
+    .jja-now-playing__right { display: flex; align-items: center; gap: 10px; }
+    .jja-mute-toggle {
+        background: transparent; border: 1px solid rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.85);
+        font-size: 15px; line-height: 1;
+        width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: border-color 0.15s, transform 0.1s;
+    }
+    .jja-mute-toggle:hover { border-color: var(--gb-red); }
+    .jja-mute-toggle:active { transform: scale(0.9); }
+    .jja-mute-toggle--muted { opacity: 0.55; }
+
     .jj-arcade__stage {
         background: var(--bg); padding: 28px 24px;
         min-height: 400px; max-width: 1000px; margin: 0 auto;
@@ -404,7 +417,10 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
                 <div class="jja-now-playing__label">Now&nbsp;Playing</div>
                 <div class="jja-now-playing__name" id="jja-playing-name">Memory Game</div>
             </div>
-            <button class="jja-btn-close-game" id="jja-btn-close">✕ Back</button>
+            <span class="jja-now-playing__right">
+                <span id="jja-mute-toggle-slot"></span>
+                <button class="jja-btn-close-game" id="jja-btn-close">✕ Back</button>
+            </span>
         </div>
         <div class="jj-arcade__stage" id="jj-arcade-stage"></div>
     </div>
@@ -541,6 +557,10 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
 wp_footer();
 ?>
 
+<!-- Jiu-Jitsu Arcade v2: shared audio/haptics + visual juice utilities (must load before game scripts) -->
+<script src="<?php echo $child_uri; ?>/assets/jj-arcade/arcade-audio.js?ver=<?php echo $ver; ?>"></script>
+<script src="<?php echo $child_uri; ?>/assets/jj-arcade/arcade-juice.js?ver=<?php echo $ver; ?>"></script>
+
 <!-- Game Scripts -->
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/memory.js?ver=<?php echo $ver; ?>"></script>
 <script src="<?php echo $child_uri; ?>/assets/jj-arcade/games/technique-match.js?ver=<?php echo $ver; ?>"></script>
@@ -652,6 +672,14 @@ var JJ_TEASERS = {
     window.JJA_HERO = { updateHero:updateHero, openStage:openStage };
 })();
 
+/* ── ARCADE v2: shared mute toggle + background music loop ── */
+(function () {
+    if (!window.JJArcadeAudio) return;
+    var slot = document.getElementById('jja-mute-toggle-slot');
+    if (slot) window.JJArcadeAudio.createMuteToggle(slot);
+    window.JJArcadeAudio.playMusic(); // no-ops until first user interaction unlocks audio
+})();
+
 /* ── ARCADE ROUTER ── */
 (function(){
     var stage    = document.getElementById('jj-arcade-stage');
@@ -689,6 +717,16 @@ var JJ_TEASERS = {
         wrap.appendChild(iframe); if(cfg.hint)wrap.appendChild(hint);
         stage.appendChild(wrap);
     }
+
+    // JJA v2: let a game size its own iframe (Space Invaders / Dojo Dash report their
+    // exact content height on mobile so the iframe hugs the game with no dead space).
+    window.addEventListener('message', function(ev){
+        if(!ev.data || (ev.data.type!=='gbSpaceInvadersHeight' && ev.data.type!=='gbDojoDashHeight')) return;
+        var f=stage.querySelector('iframe');
+        if(!f || f.contentWindow!==ev.source) return;
+        if(ev.data.height>0){ f.style.height=ev.data.height+'px'; f.style.minHeight='0'; }
+        else { f.style.height=''; f.style.minHeight=''; }
+    });
 
     function loadTeaser(id){
         var t=JJ_TEASERS[id];

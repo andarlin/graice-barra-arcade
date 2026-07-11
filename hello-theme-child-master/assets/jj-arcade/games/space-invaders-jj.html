@@ -261,14 +261,14 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    active-scale: 0.95;
+    transition: transform 0.06s ease, background 0.1s ease;
   }
-  .mob-btn:active { background: rgba(200,16,46,0.4); }
+  .mob-btn:active { background: rgba(200,16,46,0.4); transform: scale(0.94); }
   .mob-fire {
     background: rgba(245,166,35,0.15);
     border-color: rgba(245,166,35,0.6);
   }
-  .mob-fire:active { background: rgba(245,166,35,0.4); }
+  .mob-fire:active { background: rgba(245,166,35,0.4); transform: scale(0.94); }
 
 .mob-move-group {
     display: flex;
@@ -318,6 +318,16 @@
     from { transform: translateY(-100%); }
     to { transform: translateY(100%); }
   }
+
+  /* JJA v2: screen shake on player hit */
+  @keyframes jjaShake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-6px, 3px); }
+    40% { transform: translate(6px, -3px); }
+    60% { transform: translate(-4px, 2px); }
+    80% { transform: translate(4px, -2px); }
+  }
+  #screen.jja-shake { animation: jjaShake 0.3s ease; }
 
   /* Stars background */
   #stars {
@@ -530,6 +540,8 @@
   </div>
 
 
+<!-- JJA v2: shared audio/haptics utility (same instance shares mute via localStorage with the parent arcade) -->
+<script src="../arcade-audio.js"></script>
 <script>
 // =========================================================
 //  GB SPACE INVADERS – JIU-JITSU EDITION
@@ -537,6 +549,19 @@
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+// --- JJA v2: feedback layer (optional-chained; game runs unchanged if audio fails to load) ---
+const fx = {
+  sfx: function (key) { if (window.JJArcadeAudio) window.JJArcadeAudio.playSfx(key); },
+  vibe: function (p) { if (window.JJArcadeAudio) window.JJArcadeAudio.vibrate(p); },
+  shake: function () {
+    const s = document.getElementById('screen');
+    if (!s) return;
+    s.classList.remove('jja-shake');
+    void s.offsetWidth; // restart animation on rapid repeats
+    s.classList.add('jja-shake');
+  }
+};
 
 // --- ASSET LOADING ---
 const ASSETS = {};
@@ -599,6 +624,9 @@ let particlePool = [];
 let tauntFlash = null;
 let invincibleTimer = 0;
 let gameStarted = false;
+// JJA v2 fix: guards against nextWave() firing every frame during the 2s wave
+// transition (which rocketed `wave` up ~120 per clear and made wave 2 insanely fast).
+let waveClearing = false;
 
 // Input state
 const keys = {};
@@ -624,14 +652,52 @@ function initStars() {
 // --- RESIZE ---
 function resizeCanvas() {
   const maxW = Math.min(window.innerWidth, 800);
-  // Reserve: HUD top (40px) + mobile controls bottom (110px) + small margin (10px) = 160px mobile
-  // Desktop: HUD (40px) + belt bar (36px) + margin (4px) = 80px
   const isMobile = window.innerWidth <= 600 || (window.matchMedia('(hover: none) and (pointer: coarse)').matches);
-  const reserved = isMobile ? 160 : 80;
-  const maxH = window.innerHeight - reserved;
-  const scale = Math.min(maxW / 760, maxH / 620);
-  canvas.style.width = (760 * scale) + 'px';
-  canvas.style.height = (620 * scale) + 'px';
+  const HUD_H = 40;
+
+  const beltBar  = document.getElementById('beltBar');
+  const controls = document.getElementById('mobileControls');
+  const lives    = document.getElementById('livesDisplay');
+  const hi       = document.getElementById('highScoreDisplay');
+
+  if (isMobile) {
+    // JJA v2 mobile layout fix:
+    // The world is landscape (760x620); on a portrait phone the canvas is
+    // width-bound and short, which left a tall empty gap between the game and
+    // the bottom-pinned controls, and the belt bar overlapped the control pad.
+    // Fix: size the canvas to the space left after reserving a compact UI stack,
+    // then anchor belt bar + controls directly beneath the canvas, and tell the
+    // parent the exact height so the iframe hugs the game (no dead space).
+    const BELT_H = 24, CTRL_H = 92, GAP = 10;
+    const reserved = HUD_H + BELT_H + CTRL_H + GAP * 3;
+    const maxH = Math.max(200, window.innerHeight - reserved);
+    const scale = Math.min(maxW / 760, maxH / 620);
+    const ch = 620 * scale;
+    canvas.style.width  = (760 * scale) + 'px';
+    canvas.style.height = ch + 'px';
+
+    const beltTop = Math.round(HUD_H + ch + GAP);
+    const ctrlTop = beltTop + BELT_H + GAP;
+    // belt bar centered, lives/hi on the same row at the edges
+    beltBar.style.top = beltTop + 'px';  beltBar.style.bottom = 'auto';
+    lives.style.top   = beltTop + 'px';  lives.style.bottom   = 'auto';
+    hi.style.top      = beltTop + 'px';  hi.style.bottom      = 'auto';
+    controls.style.top = ctrlTop + 'px'; controls.style.bottom = 'auto';
+
+    const contentH = ctrlTop + CTRL_H + GAP;
+    try { parent.postMessage({ type: 'gbSpaceInvadersHeight', height: contentH }, '*'); } catch (e) {}
+  } else {
+    // Desktop: original behavior. Clear any inline positions set while on mobile.
+    const reserved = 80;
+    const maxH = window.innerHeight - reserved;
+    const scale = Math.min(maxW / 760, maxH / 620);
+    canvas.style.width  = (760 * scale) + 'px';
+    canvas.style.height = (620 * scale) + 'px';
+    [beltBar, controls, lives, hi].forEach(function (el) {
+      if (el) { el.style.top = ''; el.style.bottom = ''; }
+    });
+    try { parent.postMessage({ type: 'gbSpaceInvadersHeight', height: 0 }, '*'); } catch (e) {}
+  }
 }
 
 // --- INIT GAME ---
@@ -656,6 +722,7 @@ function initWave() {
   alienShootTimer = 0;
   mothershipTimer = 0;
   particlePool = [];
+  waveClearing = false; // new wave's aliens are live again
 
   // Hero
   hero = { x: W / 2 - HERO_W / 2, y: H - HERO_H - 2, speed: 5.5 };
@@ -757,7 +824,9 @@ function update(dt) {
   // Move aliens
   alienMoveTimer += dt;
   const liveAliens = aliens.filter(a => a.alive);
-  const speedMult = 1 + (1 - liveAliens.length / 50) * 1.2 + (wave - 1) * 0.15;
+  // JJA v2: gentler per-wave ramp (was (wave-1)*0.15) so waves speed up gradually
+  // and kids can progress past wave 2. Wave 1 is unchanged (wave-1 = 0).
+  const speedMult = 1 + (1 - liveAliens.length / 50) * 1.2 + (wave - 1) * 0.06;
   const effectiveInterval = Math.max(18, alienMoveInterval / speedMult);
 
   if (alienMoveTimer >= effectiveInterval) {
@@ -820,6 +889,7 @@ function update(dt) {
         b.dead = true;
         score += a.pts;
         spawnParticles(a.x + ALIEN_W/2, a.y + ALIEN_H/2, alienColor(a.type), 12);
+        fx.sfx('explosion'); // invader hit/explosion
         showTaunt(a.x + ALIEN_W/2, a.y);
         updateHUD();
         checkBeltUp();
@@ -835,6 +905,7 @@ function update(dt) {
         score += 100;
         b.dead = true;
         spawnParticles(mothership.x + 32, mothership.y + 14, '#ff44aa', 24);
+        fx.sfx('coin'); // mothership bonus
         showTaunt(mothership.x + 32, mothership.y, 'MATA LEAO!');
         checkBeltUp();
         mothership = null;
@@ -893,9 +964,12 @@ function update(dt) {
     }
   }
 
-  // Check: all aliens dead
+  // Check: all aliens dead — advance once, then wait for initWave to respawn.
   if (liveAliens.length === 0) {
-    nextWave();
+    if (!waveClearing) {
+      waveClearing = true;
+      nextWave();
+    }
     return;
   }
 
@@ -1044,6 +1118,7 @@ function draw() {
 function fireBullet() {
   if (bullets.length >= 4) return;
   bullets.push({ x: hero.x + HERO_W / 2 - BULLET_W / 2, y: hero.y - 4, trail: [] });
+  fx.sfx('shoot');
 }
 
 function rectHit(x1,y1,w1,h1, x2,y2,w2,h2) {
@@ -1078,6 +1153,9 @@ function loseLife() {
   lives--;
   invincibleTimer = 3500;
   spawnParticles(hero.x + HERO_W/2, hero.y + HERO_H/2, '#C8102E', 20);
+  fx.sfx('hit');       // player hit
+  fx.vibe('double');
+  fx.shake();          // screen shake
   updateHUD();
   if (lives <= 0) {
     triggerGameOver();
@@ -1086,6 +1164,8 @@ function loseLife() {
 
 function triggerGameOver() {
   state = 'gameover';
+  fx.sfx('stinger_lose'); // game over stinger
+  fx.vibe('double');
   if (score > hiScore) hiScore = score;
   const beltName = BELTS[Math.min(currentBelt, BELTS.length-1)].name;
   document.getElementById('finalScore').textContent = score.toLocaleString();
@@ -1101,8 +1181,12 @@ function triggerGameOver() {
 }
 
 function nextWave() {
+  fx.sfx('fanfare'); // wave clear fanfare
+  fx.vibe('win');
   wave++;
-  alienMoveInterval = Math.max(40, alienMoveInterval - 10);
+  // JJA v2: gentler per-wave speed-up (was -10 / floor 40) so difficulty steps
+  // up in smaller increments and the game stays beatable for kids.
+  alienMoveInterval = Math.max(55, alienMoveInterval - 6);
   alienShootInterval = Math.max(60, alienShootInterval - 12);
 
   // Belt check

@@ -15,6 +15,15 @@
 (function () {
   'use strict';
 
+  /* ── JJA v2: feedback layer (optional-chained; game runs unchanged if utils absent) ── */
+  var fx = {
+    sfx:  function (key) { if (window.JJArcadeAudio) window.JJArcadeAudio.playSfx(key); },
+    vibe: function (p) { if (window.JJArcadeAudio) window.JJArcadeAudio.vibrate(p); },
+    burst: function (elm) { if (window.JJArcadeJuice && elm) window.JJArcadeJuice.burstFromEl(elm); },
+    shake: function (elm) { if (window.JJArcadeJuice && elm) window.JJArcadeJuice.shake(elm); },
+    confetti: function (elm) { if (window.JJArcadeJuice && elm) window.JJArcadeJuice.confetti(elm); }
+  };
+
   /* ── PATHS ──────────────────────────────────────────────────────────────── */
 
   /* Resolve child theme URI — tries window.CHILD_URI (set by template inline script),
@@ -512,10 +521,10 @@
     });
     panel.appendChild(cg);
 
-    var sb = el('button', 'jjt-start');
+    var sb = el('button', 'jjt-start jja-pressable');
     sb.type = 'button';
     sb.innerHTML = (isTimeAttack() ? 'Start Time Attack' : 'Start Quiz') + ' <strong>▶</strong>';
-    sb.addEventListener('click', function() { startGame(container); });
+    sb.addEventListener('click', function() { fx.sfx('ui_tap'); startGame(container); });
     panel.appendChild(sb);
 
     wrap.appendChild(hero);
@@ -654,7 +663,7 @@
     var expl = el('div', 'jjt-expl');
 
     indices.forEach(function(origIdx, i) {
-      var btn = el('button', 'jjt-ans');
+      var btn = el('button', 'jjt-ans jja-pressable');
       btn.type = 'button'; btn.dataset.idx = origIdx;
       btn.innerHTML =
         '<span class="jjt-ans-letter">'+String.fromCharCode(65+i)+'</span>' +
@@ -816,6 +825,10 @@
       S.streak = 0;
     }
 
+    /* JJA v2: answer feedback */
+    if (correct) { fx.sfx('correct'); fx.vibe('short'); fx.burst(selectedBtn); }
+    else         { fx.sfx('wrong');   fx.vibe('double'); fx.shake(selectedBtn); }
+
     /* Stop speaking */
     var ci   = wrap.querySelector('.jjt-coach');
     var dots = wrap.querySelector('.jjt-dots');
@@ -887,6 +900,7 @@
     S.advT = setTimeout(function() {
       if (isTimeAttack() && S.timeLeft <= 0) { renderResults(container); return; }
       S.idx++;
+      fx.sfx('swoosh'); // question transition
       renderQuestion(container);
     }, delay);
   }
@@ -906,6 +920,10 @@
     var prev = isTimeAttack() ? getTABest() : getHS();
     var newB = metric > prev;
     if (newB) { if (isTimeAttack()) setTABest(metric); else setHS(metric); }
+
+    /* JJA v2: final-score fanfare (highscore stinger on a new personal best) */
+    if (newB) { fx.sfx('highscore'); fx.vibe('win'); }
+    else      { fx.sfx('fanfare');   fx.vibe('win'); }
 
     var catLbl = S.cat === 'all' ? 'All Questions' : getCat(S.cat).label;
 
@@ -953,9 +971,10 @@
       '</div>';
     wrap.appendChild(card);
     container.appendChild(wrap);
+    fx.confetti(card);
 
-    document.getElementById('jjt-play-again').addEventListener('click', function() { startGame(container); });
-    document.getElementById('jjt-change-cat').addEventListener('click', function() { renderSelect(container); });
+    document.getElementById('jjt-play-again').addEventListener('click', function() { fx.sfx('ui_tap'); startGame(container); });
+    document.getElementById('jjt-change-cat').addEventListener('click', function() { fx.sfx('ui_tap'); renderSelect(container); });
   }
 
   /* ── LOAD QUESTIONS ──────────────────────────────────────────────────────── */

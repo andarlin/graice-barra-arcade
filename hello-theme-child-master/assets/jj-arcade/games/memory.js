@@ -1,6 +1,16 @@
 (function () {
   window.JJGames = window.JJGames || {};
 
+  // Jiu-Jitsu Arcade v2: feedback layer -- every call is optional-chained so the
+  // game runs unchanged if the shared utilities fail to load.
+  const fx = {
+    sfx: (key) => window.JJArcadeAudio && window.JJArcadeAudio.playSfx(key),
+    vibe: (pattern) => window.JJArcadeAudio && window.JJArcadeAudio.vibrate(pattern),
+    shake: (el) => window.JJArcadeJuice && window.JJArcadeJuice.shake(el),
+    burst: (el) => window.JJArcadeJuice && window.JJArcadeJuice.burstFromEl(el),
+    confetti: (el) => window.JJArcadeJuice && window.JJArcadeJuice.confetti(el),
+  };
+
   function shuffle(arr) {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -54,7 +64,7 @@
             <h3>Done!</h3>
             <p>Total moves: <strong id="jj-final-moves"></strong></p>
             <p>Questions answered: <strong id="jj-final-q"></strong></p>
-            <button id="jj-restart" type="button">Play again</button>
+            <button id="jj-restart" class="jja-pressable" type="button">Play again</button>
           </div>
         </div>
       </div>
@@ -79,7 +89,7 @@
       deck.forEach((card, index) => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "jj-card";
+        btn.className = "jj-card jja-pressable";
         btn.dataset.index = String(index);
         btn.dataset.id = String(card.id);
 
@@ -102,6 +112,7 @@
       if (btn.classList.contains("is-matched")) return;
       if (flipped.length >= 2) return;
 
+      fx.sfx("ui_tap"); // card flip sound
       btn.classList.add("is-flipped");
       flipped.push(btn);
 
@@ -118,6 +129,10 @@
       const match = a.dataset.id === b.dataset.id;
 
       if (match) {
+        fx.sfx("correct"); // match "ding"
+        fx.vibe("short");
+        fx.burst(a);
+        fx.burst(b);
         a.classList.add("is-matched");
         b.classList.add("is-matched");
         matched++;
@@ -132,6 +147,10 @@
           }
         }, 350);
       } else {
+        fx.sfx("wrong"); // mismatch buzz
+        fx.vibe("double");
+        fx.shake(a);
+        fx.shake(b);
         setTimeout(() => {
           a.classList.remove("is-flipped");
           b.classList.remove("is-flipped");
@@ -187,7 +206,7 @@
 
       // Render 3 choice buttons
       elChoices.innerHTML = qq.choices
-        .map((label, i) => `<button class="jj-choice-btn" type="button" data-choice="${i}">${escapeHtml(label)}</button>`)
+        .map((label, i) => `<button class="jj-choice-btn jja-pressable" type="button" data-choice="${i}">${escapeHtml(label)}</button>`)
         .join("");
 
       elQuestionWrap.classList.remove("jj-hidden");
@@ -204,6 +223,7 @@
       });
 
       // Close overlay and resume
+      fx.sfx("ui_tap");
       elQuestionWrap.classList.add("jj-hidden");
       elBoard.classList.remove("jj-dim");
       lock = false;
@@ -215,6 +235,9 @@
       elVictory.classList.remove("jj-hidden");
       elBoard.classList.add("jj-hidden");
       lock = true;
+      fx.sfx("fanfare"); // win fanfare
+      fx.vibe("win");
+      fx.confetti(elVictory.querySelector(".jj-memory__victory-card") || elVictory);
     }
 
     // Choice click handling (delegated)
@@ -229,6 +252,7 @@
     });
 
     elRestart.addEventListener("click", () => {
+      fx.sfx("ui_tap");
       // reload current game config
       mount(root, gameConfig);
     });

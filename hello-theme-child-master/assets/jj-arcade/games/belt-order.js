@@ -8,6 +8,14 @@
 (function (global) {
   'use strict';
 
+  // Jiu-Jitsu Arcade v2: feedback layer -- optional-chained so the game runs
+  // unchanged if the shared utilities fail to load.
+  var fx = {
+    sfx: function (key) { if (window.JJArcadeAudio) window.JJArcadeAudio.playSfx(key); },
+    vibe: function (p) { if (window.JJArcadeAudio) window.JJArcadeAudio.vibrate(p); },
+    confetti: function (el) { if (window.JJArcadeJuice && el) window.JJArcadeJuice.confetti(el); }
+  };
+
   var ASSET_BASE = '/wp-content/themes/hello-theme-child-master/assets/jj-arcade/cards/';
   var DATA_URL   = '/wp-content/themes/hello-theme-child-master/assets/jj-arcade/data/belt-order.json';
 
@@ -185,9 +193,10 @@
     bar.className = 'bo-mode-bar';
     ['kids','adult'].forEach(function(m) {
       var btn = document.createElement('button');
-      btn.className = 'bo-mode-btn' + (m === self.mode ? ' active' : '');
+      btn.className = 'bo-mode-btn jja-pressable' + (m === self.mode ? ' active' : '');
       btn.textContent = m === 'kids' ? '🥋 Future Champions' : '🥋 Adult Belts';
       btn.addEventListener('click', function() {
+        fx.sfx('ui_tap');
         self.mode = m;
         bar.querySelectorAll('.bo-mode-btn').forEach(function(b){ b.classList.remove('active'); });
         btn.classList.add('active');
@@ -219,7 +228,7 @@
     var shuffleBtn = document.createElement('button');
     shuffleBtn.className = 'bo-btn bo-btn-shuffle';
     shuffleBtn.textContent = 'Shuffle Again';
-    shuffleBtn.addEventListener('click', function(){ self._newGame(); });
+    shuffleBtn.addEventListener('click', function(){ fx.sfx('ui_tap'); self._newGame(); });
     actions.appendChild(shuffleBtn);
     wrap.appendChild(actions);
 
@@ -305,6 +314,7 @@
 
       if (self.selected === null) {
         // First tap: select
+        fx.sfx('ui_tap'); // pickup
         self.selected = idx;
         self._highlightTap(lane);
         self._setHint(true);
@@ -356,6 +366,7 @@
         if (e.button !== 0) return;
         var srcIdx = parseInt(card.dataset.idx, 10);
         self.dragIdx = srcIdx;
+        fx.sfx('ui_tap'); // drag pickup
         card.classList.add('dragging');
 
         // Ghost
@@ -415,6 +426,8 @@
     var tmp = this.order[a];
     this.order[a] = this.order[b];
     this.order[b] = tmp;
+    fx.sfx('snap'); // drop/snap into place
+    fx.vibe('short');
     this._renderLane();
     this._setHint(false);
   };
@@ -437,7 +450,16 @@
     });
 
     this._renderScore();
-    if (allOk) { this.wins++; this._renderScore(); setTimeout(function(){ self._showWin(); }, 400); }
+    if (allOk) {
+      this.wins++;
+      this._renderScore();
+      fx.sfx('fanfare'); // correct order fanfare
+      fx.vibe('win');
+      setTimeout(function(){ self._showWin(); }, 400);
+    } else {
+      fx.sfx('wrong'); // wrong order buzz (per-card shake handled by existing .incorrect CSS)
+      fx.vibe('double');
+    }
   };
 
   Game.prototype._showWin = function () {
@@ -450,10 +472,11 @@
     var btn = document.createElement('button');
     btn.className = 'bo-btn bo-btn-check';
     btn.textContent = 'Play Again';
-    btn.addEventListener('click', function(){ ov.remove(); self._newGame(); });
+    btn.addEventListener('click', function(){ fx.sfx('ui_tap'); ov.remove(); self._newGame(); });
     ov.appendChild(btn);
     this.stage.appendChild(ov);
     this.checkBtn.disabled = true;
+    fx.confetti(ov);
   };
 
   Game.prototype._renderScore = function () {

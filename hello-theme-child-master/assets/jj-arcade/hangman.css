@@ -290,3 +290,28 @@
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }
 }
+
+/* ============================================================
+   Mobile spacing fix (JJA v2)
+   Placed at end of file so these override the base .hm-parts-container
+   / .hm-scaffold rules above at equal specificity.
+   The body-part art is 300x300 (square); the base 180x320 box left
+   ~140px of empty space above the figure (object-position: bottom),
+   creating a large gap between the category tabs and the character.
+   A square box removes that dead space and tightens surrounding margins.
+   ============================================================ */
+@media (max-width: 640px) {
+  .hm-categories {
+    margin-bottom: 10px; /* was 20px */
+  }
+  .hm-main {
+    gap: 12px; /* was 24px — closer to word/keyboard */
+  }
+  .hm-parts-container {
+    width: 200px;
+    height: 200px; /* was 180x320 — square to match the art, no dead space */
+  }
+  .hm-scaffold {
+    gap: 4px; /* was 10px */
+  }
+}
