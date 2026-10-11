@@ -2,18 +2,20 @@
 /**
  * Template Name: Jiu-Jitsu Arcade
  * @package hello-theme-child-master
- * Version: 2.9.1 — Fix: stats bar markup + hangman-host.js script tag
+ * Version: 2.9.3 — Add GB Mole Patrol
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 $child_uri = get_stylesheet_directory_uri();
-$ver       = '2.9.1';
+$ver       = '2.9.3-mole-patrol';
 
 /*
  * THUMBNAIL MAP
- * Upload the 8 .webp files to: /assets/jj-arcade/thumbnails/
+ * Upload the 10 .webp files to: /assets/jj-arcade/thumbnails/
  */
 $thumbs = [
+    'mole-patrol'      => $child_uri . '/assets/jj-arcade/thumbnails/mole_patrol_thumbnail.webp',
+    'badge-catcher'    => $child_uri . '/assets/jj-arcade/thumbnails/badge_catcher_thumbnail.webp',
     'memory'          => $child_uri . '/assets/jj-arcade/thumbnails/memory_game_thumbnail.webp',
     'technique-match' => $child_uri . '/assets/jj-arcade/thumbnails/technique_match_thumbnail.webp',
     'hangman'         => $child_uri . '/assets/jj-arcade/thumbnails/jj_hangman_thumbnail.webp',
@@ -428,7 +430,7 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
     <!-- STATS BAR — FIX: each stat wrapped in its own .jja-stat div -->
     <div class="jja-stats">
         <div class="jja-stat">
-            <div class="jja-stat__num">8</div>
+            <div class="jja-stat__num">9</div>
             <div class="jja-stat__lbl">Games</div>
         </div>
         <div class="jja-stat">
@@ -449,7 +451,7 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
     <div class="jja-carousel-section">
         <div class="jja-carousel-header">
             <span class="jja-carousel-title">All Games</span>
-            <span class="jja-carousel-count">8 Available</span>
+            <span class="jja-carousel-count">9 Available</span>
         </div>
 
         <nav class="jja-carousel-track" id="jj-arcade-nav">
@@ -527,6 +529,24 @@ if ( ! ( function_exists('elementor_theme_do_location') && elementor_theme_do_lo
                 </div>
             </button>
 
+            <button class="jj-arcade__nav-btn" data-game="badge-catcher">
+                <img class="jja-card-thumb" src="<?php echo esc_url($thumbs['badge-catcher']); ?>" alt="GB Badge Catcher" loading="lazy">
+                <div class="jja-card-body">
+                    <span class="jja-card-name">GB Badge Catcher</span>
+                    <span class="jja-card-desc">Catch GB badges and bonus stars. Keep shoes off the mat!</span>
+                    <span class="jja-card-tag">Arcade</span>
+                </div>
+            </button>
+
+            <button class="jj-arcade__nav-btn" data-game="mole-patrol">
+                <img class="jja-card-thumb" src="<?php echo esc_url($thumbs['mole-patrol']); ?>" alt="GB Mole Patrol" loading="lazy">
+                <div class="jja-card-body">
+                    <span class="jja-card-name">GB Mole Patrol</span>
+                    <span class="jja-card-desc">Tap moles, catch gold, and leave turtles alone across three dojos!</span>
+                    <span class="jja-card-tag">Arcade</span>
+                </div>
+            </button>
+
         </nav>
     </div>
 
@@ -574,6 +594,8 @@ wp_footer();
 var CHILD_URI = '<?php echo $child_uri; ?>';
 
 var JJA_GAME_META = {
+    'mole-patrol': { name:'GB Mole Patrol', tag:'Arcade', desc:'Tap moles, catch gold, and leave turtles alone across three dojos!', thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/mole_patrol_thumbnail.webp' },
+    'badge-catcher': { name:'GB Badge Catcher', tag:'Arcade', desc:'Catch GB badges and bonus stars. Keep shoes off the mat!', thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/badge_catcher_thumbnail.webp' },
     'memory':          { name:'Memory Game',     tag:'Memory',    desc:'Flip and match GB technique cards. Beat your best time.',    thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/memory_game_thumbnail.webp' },
     'technique-match': { name:'Technique Match', tag:'Knowledge', desc:'Match the move name to the right position card.',            thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/technique_match_thumbnail.webp' },
     'hangman':         { name:'JJ Hangman',      tag:'Vocabulary',desc:'Guess the BJJ term before you run out of tries.',            thumb:CHILD_URI+'/assets/jj-arcade/thumbnails/jj_hangman_thumbnail.webp' },
@@ -587,6 +609,8 @@ var JJA_GAME_META = {
 window.JJ_ARCADE_CONFIG = {
     cardFront: CHILD_URI + '/assets/jj-arcade/cards/jj-card-junior-1.png',
     games: [
+        {id:'mole-patrol',type:'iframe',title:'GB Mole Patrol',src:CHILD_URI+'/assets/jj-arcade/games/gb-mole-patrol.html'},
+        {id:'badge-catcher',type:'iframe',title:'GB Badge Catcher',src:CHILD_URI+'/assets/jj-arcade/games/gb-badge-catcher.html'},
         {
             id:'memory', type:'memory', title:'GB Junior 1 Memory Game', pairs:6,
             cards:[
@@ -721,10 +745,11 @@ var JJ_TEASERS = {
     // JJA v2: let a game size its own iframe (Space Invaders / Dojo Dash report their
     // exact content height on mobile so the iframe hugs the game with no dead space).
     window.addEventListener('message', function(ev){
-        if(!ev.data || (ev.data.type!=='gbSpaceInvadersHeight' && ev.data.type!=='gbDojoDashHeight')) return;
+        if(!ev.data || (ev.data.type!=='gbSpaceInvadersHeight' && ev.data.type!=='gbDojoDashHeight' && ev.data.type!=='gbBadgeCatcherHeight' && ev.data.type!=='gbMolePatrolHeight')) return;
         var f=stage.querySelector('iframe');
         if(!f || f.contentWindow!==ev.source) return;
-        if(ev.data.height>0){ f.style.height=ev.data.height+'px'; f.style.minHeight='0'; }
+        if(ev.origin!==window.location.origin) return;
+        if(Number.isFinite(ev.data.height) && ev.data.height>0 && ev.data.height<10000){ f.style.height=ev.data.height+'px'; f.style.minHeight='0'; }
         else { f.style.height=''; f.style.minHeight=''; }
     });
 
@@ -773,6 +798,7 @@ var JJ_TEASERS = {
             var sw=document.getElementById('jja-stage-wrap');
 
             if(sw&&sw.classList.contains('is-visible')){
+                if(window.JJA_HERO) window.JJA_HERO.updateHero(id);
                 clearActive(); btn.classList.add('active');
                 var ne=document.getElementById('jja-playing-name');
                 if(ne)ne.textContent=(JJA_GAME_META[id]||{}).name||id;
